@@ -29,6 +29,14 @@ class MarioSprite(pygame.sprite.Sprite):
             "big_turn": (17, 0, CELL_SIZE, CELL_SIZE * 2),
             "big_jump": (18, 0, CELL_SIZE, CELL_SIZE * 2),
             "big_crouch": (19, 0, CELL_SIZE, CELL_SIZE * 2),
+            "fire_stand": (26, 0, CELL_SIZE, CELL_SIZE * 2),
+            "fire_lanch": (27, 0, CELL_SIZE, CELL_SIZE * 2),
+            "big_run_1": (28, 0, CELL_SIZE, CELL_SIZE * 2),
+            "big_run_2": (29, 0, CELL_SIZE, CELL_SIZE * 2),
+            "big_run_3": (30, 0, CELL_SIZE, CELL_SIZE * 2),
+            "big_turn": (31, 0, CELL_SIZE, CELL_SIZE * 2),
+            "big_jump": (32, 0, CELL_SIZE, CELL_SIZE * 2),
+            "big_crouch": (33, 0, CELL_SIZE, CELL_SIZE * 2),
         }
 
         self.mario_images = {
@@ -51,6 +59,6 @@ class MarioSprite(pygame.sprite.Sprite):
 
         # Rander
         self.image.blit(
-            self.snake_images["small_stand"],
+            self.mario_images["small_stand"],
             (self.SCALE * self.mario.pos[0], self.SCALE * self.mario.pos[1]),
         )
