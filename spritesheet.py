@@ -32,7 +32,7 @@ class SpriteSheet:
             if colorkey == -1:
                 colorkey = image.get_at((0, 0))
             image.set_colorkey(colorkey, pygame.RLEACCEL)
-        return image
+        return image    
 
     def images_at(self, rects, colorkey=None):
         """Load a whole bunch of images and return them as a list."""

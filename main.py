@@ -1,6 +1,5 @@
 import pygame
 
-
 def main(WIDTH, HEIGHT):
     pygame.init()
 
