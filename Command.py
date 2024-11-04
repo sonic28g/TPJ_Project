@@ -1,58 +1,32 @@
 import pygame as pg
 
 class Command:
-    def execute():
-        raise NotImplemented
-    def undo():
-        raise NotImplemented
+    def execute(self):
+        raise NotImplementedError("Subclasses must implement this method")
     
-
 class Up(Command):
-    def execute():
-        pass
-
-    def undo():
-        pass
-
+    def execute(self):
+        print("Up")
+        
 class Down(Command):
-    def execute():
-        pass
-
-    def undo():
-        pass
-
+    def execute(self):
+        print("Down")
+        
 class Left(Command):
-    def execute():
-        pass
-
-    def undo():
-        pass
-
+    def execute(self):
+        print("Left")
+        
 class Right(Command):
-    def execute():
-        pass
-
-    def undo():
-        pass
-
-class Shoot(Command):
-    def execute():
-        pass
-    
-    def undo():
-        pass
-
-
-
+    def execute(self):
+        print("Right")
+        
 class InputHandler:
-    Command = {
-        "w": Up,
-        "s": Down,
-        "a": Left,
-        "d": Right,
-        "space": Shoot,
-        "left_shift": Shoot
+    command = {
+        "w": Up(),
+        "s": Down(),
+        "a": Left(),
+        "d": Right()
     }
-
+    
     def handleInput(self, key):
         self.command[key].execute()
