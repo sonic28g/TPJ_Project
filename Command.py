@@ -41,3 +41,18 @@ class Shoot(Command):
     
     def undo():
         pass
+
+
+
+class InputHandler:
+    Command = {
+        "w": Up,
+        "s": Down,
+        "a": Left,
+        "d": Right,
+        "space": Shoot,
+        "left_shift": Shoot
+    }
+
+    def handleInput(self, key):
+        self.command[key].execute()
