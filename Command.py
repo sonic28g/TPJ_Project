@@ -1,32 +1,41 @@
 import pygame as pg
 
 class Command:
-    def execute(self):
-        raise NotImplementedError("Subclasses must implement this method")
+    def __init__(self):
+        self.execute = None
     
+
 class Up(Command):
-    def execute(self):
-        print("Up")
+    def __init__(self, actor):
+        self.execute = actor.up
         
 class Down(Command):
-    def execute(self):
-        print("Down")
+    def __init__(self, actor):
+        self.execute = actor.Down
         
 class Left(Command):
-    def execute(self):
-        print("Left")
+    def __init__(self, actor):
+        self.execute = actor.left
         
 class Right(Command):
-    def execute(self):
-        print("Right")
+    def __init__(self, actor):
+        self.execute = actor.right
+
+class Shoot(Command):
+    def __init__(self, actor):
+        self.execute = actor.shoot
         
 class InputHandler:
-    command = {
-        "w": Up(),
-        "s": Down(),
-        "a": Left(),
-        "d": Right()
-    }
+
+    def __init__(self, actor):
+    
+        self.command = {
+            "w": Up(actor),
+            "s": Down(actor),
+            "a": Left(actor),
+            "d": Right(actor),
+            "space": Shoot(actor)
+        }
     
     def handleInput(self, key):
         self.command[key].execute()
