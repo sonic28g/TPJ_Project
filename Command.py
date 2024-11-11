@@ -1,5 +1,3 @@
-import pygame as pg
-
 class Command:
     def __init__(self):
         self.execute = None
@@ -24,6 +22,7 @@ class Right(Command):
 class Shoot(Command):
     def __init__(self, actor):
         self.execute = actor.shoot
+        
         
 class InputHandler:
 
