@@ -1,6 +1,4 @@
-from Observer import Observer
-
-class PhysicsEngine(Observer):
+class PhysicsEngine():
     __instance = None
     
     @staticmethod
@@ -34,7 +32,6 @@ class PhysicsEngine(Observer):
     
     def checkPlayerCollision(self, player, enemy):
         # Check if player has collided with enemy
-        # if player has collided with enemy, notify observers
         pass
     
     def update():
