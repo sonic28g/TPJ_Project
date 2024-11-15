@@ -1,16 +1,16 @@
 import pygame
-from mario import Mario
-from spritesheet import SpriteSheet
+from Player import Player
+from Spritesheet import SpriteSheet
 
 CELL_SIZE = 16
 
 class MarioSprite(pygame.sprite.Sprite):
-    def __init__(self, mario: Mario, WIDTH, HEIGHT, SCALE):
+    def __init__(self, player: Player, WIDTH, HEIGHT, SCALE):
         super().__init__()
 
         MARIO_SPRITESHEET = SpriteSheet("img/mario_sprites.png")
 
-        self.mario = mario
+        self.player = player
         self.SCALE = SCALE
 
         mario_map = {
@@ -42,23 +42,20 @@ class MarioSprite(pygame.sprite.Sprite):
         self.mario_images = {
             name: pygame.transform.scale(
                 MARIO_SPRITESHEET.image_at(
-                    (a * CELL_SIZE, b * CELL_SIZE, sa, sb), -1
-                ),
-                (SCALE, SCALE),
-            )
+                    (a * CELL_SIZE, b * CELL_SIZE, sa, sb), -1),(SCALE, SCALE),)
             for (name, (a, b, sa, sb)) in mario_map.items()
         }
 
         self.image = pygame.Surface([WIDTH * SCALE, HEIGHT * SCALE])
-        self.update()
+        self.update("small_stand")
         self.rect = self.image.get_rect()
 
-    def update(self):
+    def update(self, frame):
         self.image.fill("white")
         self.image.set_colorkey("white")
 
         # Rander
         self.image.blit(
-            self.mario_images["small_stand"],
+            self.mario_images[frame],
             (self.SCALE * self.mario.pos[0], self.SCALE * self.mario.pos[1]),
         )

@@ -1,3 +1,5 @@
+from Game import Game
+'''   
 import pygame
 
 def main(WIDTH, HEIGHT):
@@ -16,7 +18,13 @@ def main(WIDTH, HEIGHT):
 
     running = True
 
+ 
     while running:
+        i = player_input()
+        update()
+        render()
+        clock.tick(60)
+ 
         x, y = mario
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -43,9 +51,13 @@ def main(WIDTH, HEIGHT):
         pygame.display.update()
         # Control frame rate
         clock.tick(60)
-   
+
+
     pygame.quit()
+'''
 
 
 if __name__ == "__main__":
-    main(800, 600)
+    #main(800, 600)
+    game = Game()
+    game.start()
