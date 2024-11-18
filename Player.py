@@ -27,6 +27,11 @@ class Player(pg.sprite.Sprite):
         # print(f"Player position: {self.posX}, {self.posY}")
         self.posX += self.velX
         self.rect = pg.Rect(self.posX, self.posY, PLAYER_SCALE, PLAYER_SCALE)
+        
+        # DEADZONE
+        if(self.velX < ACCELERATION and self.velX > -ACCELERATION):
+            self.velX = 0
+            
 
     def up(self):
         pass 
@@ -34,10 +39,22 @@ class Player(pg.sprite.Sprite):
     def right(self):
         if self.velX < TOP_SPEED:
             self.velX += ACCELERATION
+        if(self.velX < 0):
+            self.currentSprite = self.playerSprites.mario_images["small_turn"]
+            self.currentSprite = pg.transform.flip(self.currentSprite, True, False)
+        else:
+            self.currentSprite = self.playerSprites.mario_images["small_stand"]
+            self.currentSprite = pg.transform.flip(self.currentSprite, False, False)
 
     def left(self):
         if self.velX > -TOP_SPEED:
             self.velX -= ACCELERATION
+        if(self.velX > 0):
+            self.currentSprite = self.currentSprite = self.playerSprites.mario_images["small_turn"]
+        else:
+            self.currentSprite = self.playerSprites.mario_images["small_stand"]
+            self.currentSprite = pg.transform.flip(self.currentSprite, True, False)
+
 
     def down(self):
         pass
@@ -50,6 +67,8 @@ class Player(pg.sprite.Sprite):
             self.velX -= ACCELERATION
         elif self.velX < 0:
             self.velX += ACCELERATION
+
+
     
     
         
