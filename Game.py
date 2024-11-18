@@ -32,27 +32,29 @@ class Game:
             self.clock.tick(FPS)
 
     def input(self):
+        keys = pygame.key.get_pressed()
+    
+        if not any(keys):  # If no keys are pressed
+            self.inputHandler.handleInput("nothing")
+
+        if keys[pygame.K_LEFT]:
+            self.inputHandler.handleInput("a")
+
+        if keys[pygame.K_RIGHT]:
+            self.inputHandler.handleInput("d")
+
+        if keys[pygame.K_UP]:
+            pass
+
+        if keys[pygame.K_DOWN]:
+            pass
+
+        if keys[pygame.K_SPACE]:
+            pass
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-                
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    self.world.player.posX += -5
-
-                elif event.key == pygame.K_RIGHT:
-                    self.world.player.posX += 5
-
-                elif event.key == pygame.K_UP:
-                    pass
-
-                elif event.key == pygame.K_DOWN:
-                    pass
-
-                elif event.key == pygame.K_SPACE:
-                    pass
-
-            
 
             elif event.type == self.GAME_EVENT:
                 print(event.txt)

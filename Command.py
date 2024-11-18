@@ -18,11 +18,15 @@ class Left(Command):
 class Right(Command):
     def __init__(self, actor):
         self.execute = actor.right
-        print("OI")
+        
 
 class Shoot(Command):
     def __init__(self, actor):
         self.execute = actor.shoot
+
+class Idle(Command):
+    def __init__(self, actor):
+        self.execute = actor.idle
         
         
 class InputHandler:
@@ -34,7 +38,8 @@ class InputHandler:
             "s": Down(actor),
             "a": Left(actor),
             "d": Right(actor),
-            "space": Shoot(actor)
+            "space": Shoot(actor),
+            "nothing": Idle(actor)
         }
     
     def handleInput(self, key):

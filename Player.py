@@ -25,6 +25,7 @@ class Player(pg.sprite.Sprite):
     def update(self):
         # Aqui nós apenas calculamos a nova posição e fazemos blit na graphics engine
         # print(f"Player position: {self.posX}, {self.posY}")
+        self.posX += self.velX
         self.rect = pg.Rect(self.posX, self.posY, PLAYER_SCALE, PLAYER_SCALE)
 
     def up(self):
@@ -43,6 +44,12 @@ class Player(pg.sprite.Sprite):
 
     def shoot(self):
         pass
+
+    def idle(self):
+        if self.velX > 0:
+            self.velX -= ACCELERATION
+        elif self.velX < 0:
+            self.velX += ACCELERATION
     
     
         
