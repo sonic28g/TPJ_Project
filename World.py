@@ -1,6 +1,6 @@
 import pygame as pg
 from GameVariables import *
-from GameVariables import WINDOW_H, WINDOW_W
+from GameVariables import WINDOW_H, WINDOW_W, PLAYER_SCALE
 from Player import Player
 from Camera import Camera
 from Utils import loadImage
@@ -9,7 +9,7 @@ from Utils import loadImage
 class World:
     def __init__(self, filename):
         self.level = loadImage(filename)
-        self.player = Player(0,0)
+        self.player = Player(100, 180)
         self.camera = Camera(WINDOW_W, WINDOW_H, self.level.get_width(), self.level.get_height())
         self.mobs = []
         self.gameOver = False

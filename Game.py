@@ -3,7 +3,7 @@ from GameVariables import FPS,WINDOW_W,WINDOW_H
 from PhysicsEngine import PhysicsEngine
 from GraphicsEngine import GraphicsEngine
 from World import World
-
+from Command import InputHandler
 
 class Game:
     def __init__(self):
@@ -16,6 +16,7 @@ class Game:
         self.graphicsEngine = GraphicsEngine(self.display)
         self.physicsEngine = PhysicsEngine()
         self.world = self.initWorld("assets/img/level.png")
+        self.inputHandler = InputHandler(self.world.player)
 
     
     def initWorld(self, world):

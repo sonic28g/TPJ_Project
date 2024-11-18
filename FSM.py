@@ -16,7 +16,7 @@ class FSM:
                 self.current.enter()
         self.current.update(object)
 
-        if self.current == self.end:
-            self.current.exit()
-            return False
-        return True
+        #if self.current == self.end:
+        #    self.current.exit()
+        #    return False
+        #return True

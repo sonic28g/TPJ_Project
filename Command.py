@@ -9,7 +9,7 @@ class Up(Command):
         
 class Down(Command):
     def __init__(self, actor):
-        self.execute = actor.Down
+        self.execute = actor.down
         
 class Left(Command):
     def __init__(self, actor):
@@ -18,6 +18,7 @@ class Left(Command):
 class Right(Command):
     def __init__(self, actor):
         self.execute = actor.right
+        print("OI")
 
 class Shoot(Command):
     def __init__(self, actor):

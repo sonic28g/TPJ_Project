@@ -1,6 +1,8 @@
 import pygame as pg
 from State import Idle, Walk, Jump, Crouch, Fire
 from sprites import MarioSprite
+from GameVariables import PLAYER_SCALE, ACCELERATION, TOP_SPEED
+from FSM import FSM
 
 class Player(pg.sprite.Sprite):
     def __init__(self, posX, posY):
@@ -10,27 +12,31 @@ class Player(pg.sprite.Sprite):
         self.velY = 0
         self.playerSprites = MarioSprite() # This will be the sprite sheet that contains all the player sprites
         self.currentSprite = self.playerSprites.mario_images["small_stand"] # This will be the sprite that is currently being displayed / initially the small Mario sprite
-        self.rect = self.currentSprite.get_rect()
+        self.rect = pg.Rect(self.posX, self.posY, PLAYER_SCALE, PLAYER_SCALE)
         self.isSmall = True
         self.state = Idle()
 
-        #self.moviment_states = [Idle, Walk, Jump, Crouch, Fire]
-        #self.moviment_transitions = {}
+        self.moviment_states = [Idle, Walk, Jump, Crouch, Fire]
+        self.moviment_transitions = {}
+
+        self.fsm = FSM(self.moviment_states, self.moviment_transitions)
         
     
     def update(self):
         # Aqui nós apenas calculamos a nova posição e fazemos blit na graphics engine
         # print(f"Player position: {self.posX}, {self.posY}")
-        pass
+        self.rect = pg.Rect(self.posX, self.posY, PLAYER_SCALE, PLAYER_SCALE)
 
     def up(self):
-        self.state.update()
+        pass 
 
     def right(self):
-        pass
+        if self.velX < TOP_SPEED:
+            self.velX += ACCELERATION
 
     def left(self):
-        pass
+        if self.velX > -TOP_SPEED:
+            self.velX -= ACCELERATION
 
     def down(self):
         pass
