@@ -14,6 +14,13 @@ class Player(pg.sprite.Sprite):
         self.currentSprite = self.playerSprites.mario_images["small_stand"] # This will be the sprite that is currently being displayed / initially the small Mario sprite
         self.rect = pg.Rect(self.posX, self.posY, PLAYER_SCALE, PLAYER_SCALE)
         self.isSmall = True
+
+        self.leftTurned = False
+        self.walkingSpriteInd = 0
+        self.walkingSprites = [self.playerSprites.mario_images["small_run_1"], self.playerSprites.mario_images["small_run_2"], self.playerSprites.mario_images["small_run_3"]]
+        self.FC = 0
+
+
         self.state = Idle()
 
         self.moviment_states = [Idle, Walk, Jump, Crouch, Fire]
@@ -31,6 +38,11 @@ class Player(pg.sprite.Sprite):
         # DEADZONE
         if(self.velX < ACCELERATION and self.velX > -ACCELERATION):
             self.velX = 0
+            self.currentSprite = self.playerSprites.mario_images["small_stand"]
+            self.WalkingSprite = 0
+
+
+        self.currentSprite = pg.transform.flip(self.currentSprite, self.leftTurned, False)
             
 
     def up(self):
@@ -41,10 +53,10 @@ class Player(pg.sprite.Sprite):
             self.velX += ACCELERATION
         if(self.velX < 0):
             self.currentSprite = self.playerSprites.mario_images["small_turn"]
-            self.currentSprite = pg.transform.flip(self.currentSprite, True, False)
+            self.leftTurned = True
         else:
             self.currentSprite = self.playerSprites.mario_images["small_stand"]
-            self.currentSprite = pg.transform.flip(self.currentSprite, False, False)
+            self.leftTurned = False
 
     def left(self):
         if self.velX > -TOP_SPEED:
@@ -53,7 +65,7 @@ class Player(pg.sprite.Sprite):
             self.currentSprite = self.currentSprite = self.playerSprites.mario_images["small_turn"]
         else:
             self.currentSprite = self.playerSprites.mario_images["small_stand"]
-            self.currentSprite = pg.transform.flip(self.currentSprite, True, False)
+            self.leftTurned = True
 
 
     def down(self):
