@@ -30,6 +30,3 @@ class Camera:
         y = max(-(900 - self.height), y)  # Bottom boundary
 
         self.camera = pygame.Rect(x, y, self.width, self.height)
-        
-    def other_function():
-        pass
