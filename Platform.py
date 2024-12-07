@@ -11,7 +11,7 @@ class Platform:
     def __init__(self, x, y, width, height):
         """Create a platform"""
         self.rect = pygame.Rect(x, y, width, height)
-        self.color = (139, 69, 19)  # Brown color for more natural look
+        self.color = (34, 139, 34)  # Brown color for more natural look
         self.type = "normal"  # Platform type for different behaviors
         
     def draw(self, screen, camera):

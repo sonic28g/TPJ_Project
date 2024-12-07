@@ -13,9 +13,9 @@ class Player:
         self.jump_strength = 15
         self.velocity_x = 0
         self.velocity_y = 0
-        self.acceleration = 0.2
+        self.acceleration = 0.5
         self.friction = 0.40
-        self.max_speed = 7
+        self.max_speed = 10
         
         # State attributes
         self.is_jumping = False

@@ -29,6 +29,7 @@ class SuperMario:
             
             # Determine scale factor to match game world size
             scale_factor = max(2400 / bg_width, 1800 / bg_height)
+            self.scale_factor = scale_factor
             
             # Scale the background
             self.background = pygame.transform.scale(
@@ -52,13 +53,19 @@ class SuperMario:
 
         # Create player
         self.player = Player(300, 780)
+        
+        # Player Spawn Point
+        self.spawn_point = (300, 780)
 
         # Create camera
         self.camera = Camera(self.screen_width, self.screen_height)
 
         # Create platforms across a larger map
         self.platforms = [
-            Platform(0, self.GROUND_LEVEL, 2400, 200),  # Ground platform
+            Platform(0, self.GROUND_LEVEL , 4134, 200), # First Platform
+            Platform(4265, self.GROUND_LEVEL, 890, 200), # Second Platform
+            Platform(5345, self.GROUND_LEVEL, 3829, 200), # Third Platform
+            Platform(9305, self.GROUND_LEVEL, 3323, 200), # Fourth Platform
         ]
 
         # Game state variables
@@ -81,6 +88,12 @@ class SuperMario:
         
         # Use player's move method
         self.player.move(left, right)
+        
+    def player_die(self):
+        """Handle player death"""
+        self.player.rect.x, self.player.rect.y = self.spawn_point
+        self.player.velocity_y = 0
+        self.player.velocity_x = 0
 
     def update(self):
         """Update game physics"""
@@ -91,12 +104,10 @@ class SuperMario:
         # Check for platform collisions
         for platform in self.platforms:
             if self.player.rect.colliderect(platform.rect):
-                # If falling onto platform
                 if self.player.velocity_y > 0:
                     self.player.rect.bottom = platform.rect.top
                     self.player.velocity_y = 0
                     self.player.is_jumping = False
-                # If jumping into platform from underneath
                 elif self.player.velocity_y < 0:
                     self.player.rect.top = platform.rect.bottom
                     self.player.velocity_y = 0
@@ -104,10 +115,14 @@ class SuperMario:
         self.player.update()
 
         # Prevent falling through ground
-        if self.player.rect.bottom > self.GROUND_LEVEL:
+        """ if self.player.rect.bottom > self.GROUND_LEVEL:
             self.player.rect.bottom = self.GROUND_LEVEL
             self.player.velocity_y = 0
-            self.player.is_jumping = False
+            self.player.is_jumping = False """
+            
+        # Check for death
+        if self.player.rect.y > self.GROUND_LEVEL:
+            self.player_die()
             
         # Prevent moving off screen
         if self.player.rect.left < 0:
@@ -115,10 +130,13 @@ class SuperMario:
 
         # Update camera to follow player
         self.camera.update(self.player)
+        
+        # Print both positions for comparison
+        # print(f"Platform end: {self.platforms[0].rect.right}")
+        print(f"Player x: {self.player.rect.x}")
 
     def draw(self):
         """Draw game objects"""
-        # Clear the screen
         self.screen.fill((0, 0, 0))
 
         # Draw background with camera offset
@@ -126,16 +144,12 @@ class SuperMario:
 
         # Draw platforms
         for platform in self.platforms:
-            # Only draw platforms that are within the camera view
             if self.camera.camera.colliderect(platform.rect):
-                pygame.draw.rect(self.screen, platform.color, 
-                                 self.camera.apply_rect(platform.rect))
+                pygame.draw.rect(self.screen, (139, 69, 19), self.camera.apply_rect(platform.rect))
 
         # Draw player
-        # pygame.draw.rect(self.screen, self.player.color, self.camera.apply(self.player))
         self.player.draw(self.screen, self.camera)
-        
-        # Update display
+
         pygame.display.flip()
 
     def run(self):
