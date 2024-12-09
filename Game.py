@@ -102,6 +102,10 @@ class Game:
                     self.player.jump()  
                 elif event.key == pygame.K_ESCAPE and self.game_state == PLAYING:
                     self.game_state = PAUSED
+            
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_SPACE:
+                    self.player.release_jump()
 
         # Get pressed keys for movement
         keys = pygame.key.get_pressed()
