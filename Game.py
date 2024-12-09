@@ -85,7 +85,12 @@ class Game:
         ]
 
         self.tubes = [
-            Tube(1600,700),
+            Tube(1676,660),
+            Tube(2276,600),
+            Tube(2756,540),
+            Tube(3416,540),
+            Tube(9776,660),
+            Tube(10736,660),
         ]
 
         # Game state variables
