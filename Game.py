@@ -129,16 +129,20 @@ class Game:
         # Check for platform collisions
         for platform in self.platforms:
             if self.player.rect.colliderect(platform.rect):
-                if self.player.velocity_y > 0:
+                if self.player.velocity_y > 0 and self.player.rect.right > platform.rect.left + 10 and self.player.rect.left < platform.rect.right - 10:
                     self.player.rect.bottom = platform.rect.top
                     self.player.velocity_y = 0
                     self.player.is_jumping = False
                 elif self.player.velocity_y < 0:
                     self.player.rect.top = platform.rect.bottom
-                    self.player.velocity_y = 0
+                    self.player.velocity_y = 0 
+                elif self.player.rect.right > platform.rect.left and self.player.rect.left < platform.rect.left:
+                    self.player.rect.right = platform.rect.left
+                elif self.player.rect.left < platform.rect.right and self.player.rect.right > platform.rect.right:
+                    self.player.rect.left = platform.rect.right
 
         for tube in self.tubes:
-            if tube.rect.colliderect(self.player.rect):
+            if self.player.rect.colliderect(tube.rect):
                 if (
                     self.player.rect.top < tube.rect.top 
                     and self.player.velocity_y > 0  
@@ -147,14 +151,10 @@ class Game:
                 ):
                     self.player.rect.bottom = tube.rect.top
                     self.player.velocity_y = 0  
-                    self.player.is_jumping = False  
-
+                    self.player.is_jumping = False 
                 elif self.player.rect.right > tube.rect.left and self.player.rect.left < tube.rect.left:
-                    # Collision from the left
                     self.player.rect.right = tube.rect.left
-
                 elif self.player.rect.left < tube.rect.right and self.player.rect.right > tube.rect.right:
-                    # Collision from the right
                     self.player.rect.left = tube.rect.right
                     
         self.player.update()
