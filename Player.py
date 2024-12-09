@@ -33,6 +33,7 @@ class Player:
             'idle': [],
             'walk': [],
             'jump': [],
+            'dead': [],
         }
         
         try:

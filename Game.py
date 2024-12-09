@@ -1,7 +1,8 @@
 import pygame
 import sys
 import os
-from Camera import Camera
+from Tube import Tube
+from camera import Camera
 from Player import Player
 from Platform import Platform
 from Settings import *
@@ -75,6 +76,10 @@ class Game:
             Platform(9305, self.GROUND_LEVEL, 3323, 200), # Fourth Platform
         ]
 
+        self.tubes = [
+            Tube(1600,700),
+        ]
+
         # Game state variables
         self.running = True
 
@@ -121,6 +126,26 @@ class Game:
                 elif self.player.velocity_y < 0:
                     self.player.rect.top = platform.rect.bottom
                     self.player.velocity_y = 0
+
+        for tube in self.tubes:
+            if tube.rect.colliderect(self.player.rect):
+                if (
+                    self.player.rect.top < tube.rect.top 
+                    and self.player.velocity_y > 0  
+                    and self.player.rect.right > tube.rect.left + 5  # Sufficient horizontal overlap (right side)
+                    and self.player.rect.left < tube.rect.right - 5  # Sufficient horizontal overlap (left side)
+                ):
+                    self.player.rect.bottom = tube.rect.top
+                    self.player.velocity_y = 0  
+                    self.player.is_jumping = False  
+
+                elif self.player.rect.right > tube.rect.left and self.player.rect.left < tube.rect.left:
+                    # Collision from the left
+                    self.player.rect.right = tube.rect.left
+
+                elif self.player.rect.left < tube.rect.right and self.player.rect.right > tube.rect.right:
+                    # Collision from the right
+                    self.player.rect.left = tube.rect.right
                     
         self.player.update()
 
@@ -153,6 +178,11 @@ class Game:
         for platform in self.platforms:
             if self.camera.camera.colliderect(platform.rect):
                 pygame.draw.rect(self.screen, (139, 69, 19), self.camera.apply_rect(platform.rect))
+        
+        for tube in self.tubes:
+            tube.draw(self.screen, self.camera)
+
+        print(self.player.rect)
 
         # Draw player
         self.player.draw(self.screen, self.camera)
