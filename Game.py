@@ -8,7 +8,7 @@ from Platform import Platform
 from MainMenu import MainMenu
 from PauseMenu import PauseMenu
 from Settings import *
-from Settings import *
+from Block import *
 
 class Game:
     def __init__(self):
@@ -23,8 +23,8 @@ class Game:
         self.lives = 3
 
         # Screen setup
-        self.screen_width = 900
-        self.screen_height = 600
+        self.screen_width = SCREEN_WIDTH
+        self.screen_height = SCREEN_HEIGHT
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         pygame.display.set_caption(GAME_TITLE)
         
@@ -93,6 +93,97 @@ class Game:
             Tube(10736,660),
         ]
 
+        self.blocks = [
+            BlockInt(960,540),
+            BlockBreak(1200,540),
+            BlockInt(1260,540),
+            BlockBreak(1320,540),
+            BlockInt(1380,540),
+            BlockBreak(1440,540),
+            BlockInt(1320,300),
+            BlockBreak(4620,540),
+            BlockInt(4680,540),
+            BlockBreak(4740,540),
+            BlockBreak(4800,300),
+            BlockBreak(4860,300),
+            BlockBreak(4920,300),
+            BlockBreak(4980,300),
+            BlockBreak(5040,300),
+            BlockBreak(5100,300),
+            BlockBreak(5160,300),
+            BlockBreak(5220,300),
+            BlockBreak(5460,300),
+            BlockBreak(5520,300),
+            BlockBreak(5580,300),
+            BlockInt(5640,300),
+            BlockBreak(5640,540),
+            BlockBreak(6000,540),
+            BlockBreak(6060,540),
+            BlockInt(6360,540),
+            BlockInt(6540,540),
+            BlockInt(6540,300),
+            BlockInt(6720,540),
+            BlockBreak(7080,540),
+            BlockBreak(7260,300),
+            BlockBreak(7320,300),
+            BlockBreak(7380,300),
+            BlockBreak(7680,300),
+            BlockInt(7740,300),
+            BlockInt(7800,300),
+            BlockBreak(7860,300),
+            BlockBreak(7740,540),
+            BlockBreak(7800,540),
+            BlockBrick(8040,720),
+            BlockBrick(8100,660),
+            BlockBrick(8160,600),
+            BlockBrick(8220,540),
+            BlockBrick(8220,600),
+            BlockBrick(8220,660),
+            BlockBrick(8220,720),
+            BlockBrick(8400,540),
+            BlockBrick(8400,600),
+            BlockBrick(8400,660),
+            BlockBrick(8400,720),
+            BlockBrick(8460,600),
+            BlockBrick(8520,660),
+            BlockBrick(8580,720),
+            BlockBrick(8880,720),
+            BlockBrick(8940,660),
+            BlockBrick(9000,600),
+            BlockBrick(9060,540),
+            BlockBrick(9120,540),
+            BlockBrick(9120,600),
+            BlockBrick(9120,660),
+            BlockBrick(9120,720),
+            BlockBrick(9300,540),
+            BlockBrick(9300,600),
+            BlockBrick(9300,660),
+            BlockBrick(9300,720),
+            BlockBrick(9360,600),
+            BlockBrick(9420,660),
+            BlockBrick(9480,720),
+            BlockBreak(10080,540),
+            BlockBreak(10140,540),
+            BlockInt(10200,540),
+            BlockBreak(10260, 540),
+            BlockBrick(10860,720),
+            BlockBrick(10920,660),
+            BlockBrick(10980,600),
+            BlockBrick(11040,540),
+            BlockBrick(11100,480),
+            BlockBrick(11160,420),
+            BlockBrick(11220,360),
+            BlockBrick(11280,300),
+            BlockBrick(11340,300),
+            BlockBrick(11340,360),
+            BlockBrick(11340,420),
+            BlockBrick(11340,480),
+            BlockBrick(11340,540),
+            BlockBrick(11340,600),
+            BlockBrick(11340,660),
+            BlockBrick(11340,720),
+        ]
+
         # Game state variables
         self.running = True
 
@@ -150,6 +241,39 @@ class Game:
                 elif self.player.rect.left < platform.rect.right and self.player.rect.right > platform.rect.right:
                     self.player.rect.left = platform.rect.right
 
+        for block in self.blocks:
+            if self.player.rect.colliderect(block.rect):
+                # Check if the player is landing on the block
+                if (
+                    self.player.rect.top < block.rect.top
+                    and self.player.velocity_y > 0
+                    and self.player.rect.right > block.rect.left + 5  # Sufficient horizontal overlap (right side)
+                    and self.player.rect.left < block.rect.right - 5  # Sufficient horizontal overlap (left side)
+                ):
+                    self.player.rect.bottom = block.rect.top
+                    self.player.velocity_y = 0
+                    self.player.is_jumping = False
+                # Check if the player hits the bottom of the block
+                elif (
+                    self.player.rect.bottom > block.rect.bottom
+                    and self.player.velocity_y < 0  # Moving upwards
+                    and self.player.rect.right > block.rect.left + 5  # Avoid triggering on side collisions
+                    and self.player.rect.left < block.rect.right - 5  # Avoid triggering on side collisions
+                ):
+                    self.player.rect.top = block.rect.bottom
+                    self.player.velocity_y = self.GRAVITY  # Set a positive velocity to simulate falling
+                    if isinstance(block, BlockInt):
+                        block.hit()
+
+                   
+ 
+                # Check for left-side collision
+                elif self.player.rect.right > block.rect.left and self.player.rect.left < block.rect.left:
+                    self.player.rect.right = block.rect.left
+                # Check for right-side collision
+                elif self.player.rect.left < block.rect.right and self.player.rect.right > block.rect.right:
+                    self.player.rect.left = block.rect.right
+
         for tube in self.tubes:
             if self.player.rect.colliderect(tube.rect):
                 if (
@@ -199,6 +323,9 @@ class Game:
         
         for tube in self.tubes:
             tube.draw(self.screen, self.camera)
+
+        for block in self.blocks:
+            block.draw(self.screen, self.camera)
 
         print(self.player.rect)
 
