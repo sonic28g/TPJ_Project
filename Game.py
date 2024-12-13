@@ -37,10 +37,10 @@ class Game:
         
         # Store initial monster spawn points
         self.monster_spawn_points = [
-            ('goomba', 1500, 600),
-            ('goomba', 2500, 600),
-            ('koopa', 3500, 600),
-            ('goomba', 4500, 600)
+            ('goomba', 1500, GROUND_LEVEL),
+            ('goomba', 2500, GROUND_LEVEL),
+            ('koopa', 6540, GROUND_LEVEL),
+            ('goomba', 8156, 536)
         ]
         
         # Spawn initial monsters
@@ -417,6 +417,8 @@ class Game:
         # Update camera to follow player
         self.camera.update(self.player)
         
+        print(self.player.rect.x, self.player.rect.y)
+        
     def draw(self):
         """Draw game objects"""
         self.screen.fill((0, 0, 0))
@@ -435,8 +437,12 @@ class Game:
         for block in self.blocks:
             block.draw(self.screen, self.camera)
         
+        # Draw monsters only if they're within 600 units of the player
         for monster in self.monsters:
-            monster.draw(self.screen, self.camera)
+            # Calculate distance between player and monster
+            distance = abs(self.player.rect.centerx - monster.rect.centerx)
+            if distance <= 600:  # Only draw if within range
+                monster.draw(self.screen, self.camera)
 
         # Draw player
         self.player.draw(self.screen, self.camera)
