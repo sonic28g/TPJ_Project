@@ -213,15 +213,32 @@ class Game:
         
     def player_die(self):
         """Handle player death"""
-        self.lives -= 1
-        if self.lives <= 0:
-            self.running = False
-        self.player.rect.x, self.player.rect.y = self.spawn_point
-        self.player.velocity_y = 0
-        self.player.velocity_x = 0
+        if not self.player.is_death_animating:
+            self.lives -= 1
+            self.player.die()
 
     def update(self):
         """Update game physics"""
+        # Check for death first
+        if self.player.rect.y > self.GROUND_LEVEL:
+            self.player_die()
+            
+        # If death animation is playing, only update player
+        if self.player.is_death_animating:
+            self.player.update()
+            # Check if player has fallen far enough to reset
+            if self.player.rect.y > self.GROUND_LEVEL + 500:  # Wait until player falls well below screen
+                if self.lives <= 0:
+                    self.running = False
+                else:
+                    self.player.is_death_animating = False
+                    self.player.is_dead = False
+                    self.player.can_move = True
+                    self.player.rect.x, self.player.rect.y = self.spawn_point
+                    self.player.velocity_y = 0
+                    self.player.velocity_x = 0
+            return
+            
         # Apply gravity
         self.player.velocity_y += self.GRAVITY
         self.player.rect.y += self.player.velocity_y
@@ -297,10 +314,6 @@ class Game:
             self.player.rect.bottom = self.GROUND_LEVEL
             self.player.velocity_y = 0
             self.player.is_jumping = False """
-            
-        # Check for death
-        if self.player.rect.y > self.GROUND_LEVEL:
-            self.player_die()
             
         # Prevent moving off screen
         if self.player.rect.left < 0:

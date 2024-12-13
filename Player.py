@@ -27,6 +27,10 @@ class Player:
         self.facing_right = True
         self.holding_jump = False
         
+        # Death animation attributes
+        self.death_jump_velocity = -15
+        self.is_death_animating = False
+        
         # Animation handling
         self.current_sprite = 0
         self.animation_speed = 0.2
@@ -77,11 +81,14 @@ class Player:
             
     def die(self):
         """Initialize player death sequence"""
-        self.is_dead = True
-        self.can_move = False
-        self.current_animation = 'dead'
-        self.current_sprite = 0
-        self.velocity_x = 0
+        if not self.is_death_animating:
+            self.is_dead = True
+            self.can_move = False
+            self.current_animation = 'dead'
+            self.current_sprite = 0
+            self.velocity_x = 0
+            self.velocity_y = self.death_jump_velocity
+            self.is_death_animating = True
     
     def move(self, left, right):
         """Handle horizontal movement with acceleration and friction"""
@@ -129,6 +136,12 @@ class Player:
     
     def update(self):
         """Update player state and animation"""
+        if self.is_death_animating:
+            # Only update vertical position during death animation
+            self.velocity_y += 0.8
+            self.rect.y += self.velocity_y
+            return
+        
         if self.is_jumping:
             self.current_animation = 'jump'
             self.current_sprite = 0  # Use jump frame
