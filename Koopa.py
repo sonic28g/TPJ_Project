@@ -7,6 +7,7 @@ class Koopa(Monster):
         super().__init__(x, y)
         self.is_shell = False
         self.shell_speed = 10
+        self.facing_right = False
         self.initial_velocity_x = self.velocity_x  # Store initial velocity
         self.load_sprites()
         
@@ -21,7 +22,7 @@ class Koopa(Monster):
         new_koopa.current_animation = self.current_animation
         new_koopa.is_shell = self.is_shell
         new_koopa.shell_speed = self.shell_speed
-        return new_koopa
+        return new_koopa  
         
     def load_sprites(self):
         """Load Koopa-specific sprites"""
@@ -45,6 +46,35 @@ class Koopa(Monster):
             placeholder.fill((0, 255, 0))  # Green color
             self.sprites['walk'].append(placeholder)
             self.sprites['dead'].append(placeholder)
+            
+    def update(self):
+        if self.is_alive:
+            if self.velocity_x < 0:
+                self.facing_right = True
+            elif self.velocity_x > 0:
+                self.facing_right = False
+        
+        super().update()
+    
+    def draw(self, screen, camera):
+        if self.current_animation in self.sprites:
+            sprite_list = self.sprites[self.current_animation]
+            if sprite_list:  # Check if the list has any sprites
+                if len(sprite_list) == 1:
+                    # If only one sprite, always use index 0
+                    current_sprite = sprite_list[0]
+                else:
+                    # For multi-frame animations, use modulo to cycle through frames
+                    sprite_index = int(self.current_sprite) % len(sprite_list)
+                    current_sprite = sprite_list[sprite_index]
+                    
+                if not self.facing_right:
+                    # Flip the sprite if facing left
+                    current_sprite = pygame.transform.flip(current_sprite, True, False)
+                    
+                # Draw the sprite at the correct position with camera offset
+                sprite_rect = current_sprite.get_rect(topleft=(self.rect.x, self.rect.y))
+                screen.blit(current_sprite, camera.apply_rect(sprite_rect))
             
     def convert_to_shell(self):
         """Convert Koopa to shell state"""
