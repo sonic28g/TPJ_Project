@@ -15,6 +15,28 @@ class BlockBreak(Block):
         self.image = pg.image.load('assets/level/tiles.png').convert_alpha()
         self.image = self.image.subsurface(32*2,0,32,32)
         self.image = pg.transform.scale(self.image, (60, 60))
+        self.original_y = y
+        self.is_animating = False
+        self.animation_progress = 0
+        self.animation_speed = 2
+        self.max_offset = 10
+
+    def update(self):
+        if self.is_animating:
+            if self.animation_progress < self.max_offset:
+                self.rect.y = self.original_y - self.animation_progress
+                self.animation_progress += self.animation_speed
+            elif self.animation_progress < self.max_offset * 2:
+                self.rect.y = self.original_y - (self.max_offset * 2 - self.animation_progress)
+                self.animation_progress += self.animation_speed
+            else:
+                self.rect.y = self.original_y
+                self.is_animating = False
+                self.animation_progress = 0
+
+    def hit(self):
+        if not self.is_animating:
+            self.is_animating = True
 
 class BlockInt(Block):
     def __init__(self, x, y):

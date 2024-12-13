@@ -320,11 +320,9 @@ class World:
                 ):
                     self.player.rect.top = block.rect.bottom
                     self.player.velocity_y = GRAVITY  # Set a positive velocity to simulate falling
-                    if isinstance(block, BlockInt):
+                    if isinstance(block, (BlockInt, BlockBreak)):
                         block.hit()
 
-                   
- 
                 # Check for left-side collision
                 elif self.player.rect.right > block.rect.left and self.player.rect.left < block.rect.left:
                     self.player.rect.right = block.rect.left
@@ -364,6 +362,10 @@ class World:
         # Prevent player moving off screen
         if self.player.rect.left < 0:
             self.player.rect.left = 0
+            
+        # Update blocks
+        for block in self.blocks:
+            block.update()
             
         # Update camera to follow player
         self.camera.update(self.player)
