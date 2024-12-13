@@ -154,7 +154,7 @@ class World:
             ('goomba', 5500, GROUND_LEVEL),
         ]
         
-        self.spawn_initial_monsters()
+        self.spawn_initial_entities()
 
     def load_background(self):
         try:
@@ -176,13 +176,17 @@ class World:
             self.lives -= 1
             self.player.die()
             # Reset all monsters to their initial positions
-            self.spawn_initial_monsters()
+            self.spawn_initial_entities()
     
-    def spawn_initial_monsters(self):
+    def spawn_initial_entities(self):
         self.monsters = []
         for monster_type, x, y in self.monster_spawn_points:
             monster = self.monster_spawner.spawn_monster(monster_type, x, y)
             self.monsters.append(monster)
+        # Reset blocks
+        for block in self.blocks:
+            if isinstance(block, BlockBreak):
+                block.reset()
 
     def update(self):
         # Check for death first
@@ -321,7 +325,10 @@ class World:
                     self.player.rect.top = block.rect.bottom
                     self.player.velocity_y = GRAVITY  # Set a positive velocity to simulate falling
                     if isinstance(block, (BlockInt, BlockBreak)):
-                        block.hit()
+                        if isinstance(block, BlockBreak):
+                            block.hit(self.player.is_big)
+                        elif isinstance(block, BlockInt):
+                            block.hit()
 
                 # Check for left-side collision
                 elif self.player.rect.right > block.rect.left and self.player.rect.left < block.rect.left:

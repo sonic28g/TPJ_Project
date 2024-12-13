@@ -22,7 +22,7 @@ class Player:
         self.is_walking = False
         self.facing_right = True
         self.holding_jump = False
-        self.is_big = False
+        self.is_big = True
         
         # Death animation attributes
         self.is_death_animating = False
