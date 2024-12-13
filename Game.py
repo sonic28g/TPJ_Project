@@ -38,8 +38,8 @@ class Game:
         # Store initial monster spawn points
         self.monster_spawn_points = [
             ('goomba', 1500, GROUND_LEVEL),
-            ('goomba', 2500, GROUND_LEVEL),
-            ('koopa', 6540, GROUND_LEVEL),
+            #('goomba', 2500, GROUND_LEVEL),
+            ('koopa', 2500, GROUND_LEVEL),
             ('goomba', 8156, 536)
         ]
         
@@ -269,62 +269,74 @@ class Game:
                     self.player.velocity_x = 0
             return
         
+        # List for active monsters
+        active_monsters = []
+        
         # First update monsters
         for monster in self.monsters:
-            # Update monster position
             monster.update()
-            
-            # Apply platform collisions for monsters
-            for platform in self.platforms:
-                if monster.rect.colliderect(platform.rect):
-                    # Landing on platform
-                    if monster.velocity_y > 0:
-                        monster.rect.bottom = platform.rect.top
-                        monster.velocity_y = 0
-                    # Hitting platform from below
-                    elif monster.velocity_y < 0:
-                        monster.rect.top = platform.rect.bottom
-                        monster.velocity_y = 0
-                    # Hitting platform from sides
-                    elif monster.rect.right > platform.rect.left and monster.rect.left < platform.rect.left:
-                        monster.rect.right = platform.rect.left
-                        monster.velocity_x *= -1  # Reverse direction
-                    elif monster.rect.left < platform.rect.right and monster.rect.right > platform.rect.right:
-                        monster.rect.left = platform.rect.right
-                        monster.velocity_x *= -1  # Reverse direction
-            
-            # Apply pipe collisions for monsters
-            for tube in self.tubes:
-                if monster.rect.colliderect(tube.rect):
-                    # Monster landing on pipe
-                    if monster.velocity_y > 0 and monster.rect.bottom < tube.rect.centery:
-                        monster.rect.bottom = tube.rect.top
-                        monster.velocity_y = 0
-                    # Monster hitting pipe from sides
-                    elif monster.rect.right > tube.rect.left and monster.rect.left < tube.rect.left:
-                        monster.rect.right = tube.rect.left
-                        monster.velocity_x *= -1  # Reverse direction
-                    elif monster.rect.left < tube.rect.right and monster.rect.right > tube.rect.right:
-                        monster.rect.left = tube.rect.right
-                        monster.velocity_x *= -1  # Reverse direction
-            
-            # Check collision with player
-            if monster.rect.colliderect(self.player.rect):
-                # Player is above monster (stomping)
-                if (self.player.velocity_y > 0 and 
-                    self.player.rect.bottom < monster.rect.centery + 10):
-                    if isinstance(monster, Koopa) and monster.is_shell:
-                        # Kick shell
-                        direction = 1 if self.player.rect.centerx < monster.rect.centerx else -1
-                        monster.kick_shell(direction)
+
+            if monster.is_alive:
+                # Apply platform collisions for monsters
+                for platform in self.platforms:
+                    if monster.rect.colliderect(platform.rect):
+                        # [Platform collision logic remains the same]
+                        if monster.velocity_y > 0:
+                            monster.rect.bottom = platform.rect.top
+                            monster.velocity_y = 0
+                        elif monster.velocity_y < 0:
+                            monster.rect.top = platform.rect.bottom
+                            monster.velocity_y = 0
+                        elif monster.rect.right > platform.rect.left and monster.rect.left < platform.rect.left:
+                            monster.rect.right = platform.rect.left
+                            monster.velocity_x *= -1
+                        elif monster.rect.left < platform.rect.right and monster.rect.right > platform.rect.right:
+                            monster.rect.left = platform.rect.right
+                            monster.velocity_x *= -1
+                
+                # Apply pipe collisions for monsters
+                for tube in self.tubes:
+                    if monster.rect.colliderect(tube.rect):
+                        if monster.velocity_y > 0 and monster.rect.bottom < tube.rect.centery:
+                            monster.rect.bottom = tube.rect.top
+                            monster.velocity_y = 0
+                        elif monster.rect.right > tube.rect.left and monster.rect.left < tube.rect.left:
+                            monster.rect.right = tube.rect.left
+                            monster.velocity_x *= -1
+                        elif monster.rect.left < tube.rect.right and monster.rect.right > tube.rect.right:
+                            monster.rect.left = tube.rect.right
+                            monster.velocity_x *= -1
+                
+                # Check collision with player
+                if monster.rect.colliderect(self.player.rect):
+                    # Player is above monster (stomping)
+                    if (self.player.velocity_y > 0 and self.player.rect.bottom < monster.rect.centery + 10):
+                        if isinstance(monster, Koopa):
+                            if not monster.is_shell:
+                                # Turn into shell instead of dying
+                                monster.convert_to_shell()
+                                self.player.velocity_y = -15
+                                self.score += 100
+                            else:
+                                # If already a shell, kick it
+                                direction = 1 if self.player.rect.centerx < monster.rect.centerx else -1
+                                monster.kick_shell(direction)
+                        else:
+                            monster.die()
+                            self.player.velocity_y = -15  # Bounce player up
+                            self.score += 100
                     else:
-                        monster.die()
-                        self.player.velocity_y = -10  # Bounce player up
-                        self.score += 100
-                elif monster.is_alive:  # Only die if monster is alive
-                    # Player dies if touching monster from the side or below
-                    self.player_die()
-            
+                        # Player dies if touching monster from the side or below
+                        self.player_die()
+                        return
+                        
+            # Keep the monster if it's still alive, is a Koopa shell, or is playing death animation
+            if  monster.is_alive or isinstance(monster, Koopa) or (isinstance(monster, Goomba) and not monster.should_remove()):
+                active_monsters.append(monster)
+        
+        # Update the monsters list to only include active monsters
+        self.monsters = active_monsters
+        
         # Apply gravity
         self.player.velocity_y += self.GRAVITY
         self.player.rect.y += self.player.velocity_y

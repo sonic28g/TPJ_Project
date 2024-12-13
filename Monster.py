@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 class Monster(ABC):
     def __init__(self, x, y):
         self.rect = pygame.Rect(x, y, 64, 64)
-        self.velocity_x = -2  # Default moving left
+        self.velocity_x = -2
         self.velocity_y = 0
         self.is_alive = True
         self.sprites = {'walk': [], 'dead': []}
@@ -46,8 +46,17 @@ class Monster(ABC):
         
     def draw(self, screen, camera):
         """Draw the monster"""
-        current_sprite = self.sprites[self.current_animation][int(self.current_sprite)]
-        # Flip sprite based on direction
-        if self.velocity_x > 0:
-            current_sprite = pygame.transform.flip(current_sprite, True, False)
-        screen.blit(current_sprite, camera.apply(self))
+        if self.current_animation in self.sprites:
+            sprite_list = self.sprites[self.current_animation]
+            if sprite_list:  # Check if the list has any sprites
+                if len(sprite_list) == 1:
+                    # If only one sprite, always use index 0
+                    current_sprite = sprite_list[0]
+                else:
+                    # For multi-frame animations, use modulo to cycle through frames
+                    sprite_index = int(self.current_sprite) % len(sprite_list)
+                    current_sprite = sprite_list[sprite_index]
+                
+                # Draw the sprite at the correct position with camera offset
+                sprite_rect = current_sprite.get_rect(topleft=(self.rect.x, self.rect.y))
+                screen.blit(current_sprite, camera.apply_rect(sprite_rect))
