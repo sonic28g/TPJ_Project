@@ -87,11 +87,18 @@ class Player:
             self.current_animation = 'dead'
             self.current_sprite = 0
             self.velocity_x = 0
-            self.velocity_y = self.death_jump_velocity
+            self.velocity_y = self.death_jump_velocity  # Apply initial upward velocity
             self.is_death_animating = True
+            # Immediately update to death sprite
+            self.image = self.sprites['dead'][0]
     
     def move(self, left, right):
         """Handle horizontal movement with acceleration and friction"""
+        
+        # Don't allow movement during death animation
+        if self.is_death_animating:
+            return
+        
         # Apply acceleration based on input
         if right:
             self.velocity_x = min(self.velocity_x + self.acceleration, self.max_speed)
@@ -137,7 +144,7 @@ class Player:
     def update(self):
         """Update player state and animation"""
         if self.is_death_animating:
-            # Only update vertical position during death animation
+            self.image = self.sprites['dead'][0]
             self.velocity_y += 0.8
             self.rect.y += self.velocity_y
             return
