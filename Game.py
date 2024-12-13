@@ -213,6 +213,11 @@ class Game:
         # Spawn all monsters from spawn points
         for monster_type, x, y in self.monster_spawn_points:
             monster = self.monster_spawner.spawn_monster(monster_type, x, y)
+            # For Koopas, ensure they're reset to walking state
+            if isinstance(monster, Koopa):
+                monster.is_shell = False
+                monster.velocity_x = monster.initial_velocity_x  # You might need to add this attribute
+                monster.current_animation = 'walk'
             self.monsters.append(monster)
 
     def handle_events(self):
@@ -318,14 +323,21 @@ class Game:
                                 self.player.velocity_y = -15
                                 self.score += 100
                             else:
-                                # If already a shell, kick it
-                                direction = 1 if self.player.rect.centerx < monster.rect.centerx else -1
-                                monster.kick_shell(direction)
+                                # If already a shell
+                                if monster.velocity_x != 0:
+                                    # If shell is moving, stop it
+                                    monster.velocity_x = 0
+                                else:
+                                    # If shell is stopped, kick it
+                                    direction = 1 if self.player.rect.centerx < monster.rect.centerx else -1
+                                    monster.kick_shell(direction)
+                                self.player.velocity_y = -10  # Add bounce when kicking shell
+                                self.score += 100
                         else:
                             monster.die()
                             self.player.velocity_y = -15  # Bounce player up
                             self.score += 100
-                    else:
+                    elif monster.is_alive or (isinstance(monster, Koopa) and monster.is_shell and monster.velocity_x != 0):
                         # Player dies if touching monster from the side or below
                         self.player_die()
                         return

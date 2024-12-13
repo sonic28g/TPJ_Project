@@ -7,6 +7,7 @@ class Koopa(Monster):
         super().__init__(x, y)
         self.is_shell = False
         self.shell_speed = 10
+        self.initial_velocity_x = self.velocity_x  # Store initial velocity
         self.load_sprites()
         
     def clone(self):
