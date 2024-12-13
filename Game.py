@@ -1,9 +1,7 @@
 import pygame
 from Camera import Camera
-from Player import Player
 from MainMenu import MainMenu
 from PauseMenu import PauseMenu
-from MonsterSpawner import MonsterSpawner
 from Settings import *
 from Block import *
 from World import World
@@ -35,15 +33,9 @@ class Game:
         # Game clock
         self.clock = pygame.time.Clock()
         self.fps = 60
-
-        # Player
-        self.player = Player(300, 780)
         
         # World
         self.world = World()
-        
-        # Camera
-        self.camera = Camera(self.screen_width, self.screen_height)
         
 
     def handle_events(self):
@@ -53,14 +45,14 @@ class Game:
                 self.running = False
             
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE and not self.player.is_jumping:
-                    self.player.jump()  
+                if event.key == pygame.K_SPACE and not self.world.player.is_jumping:
+                    self.world.player.jump()  
                 elif event.key == pygame.K_ESCAPE and self.game_state == PLAYING:
                     self.game_state = PAUSED
             
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_SPACE:
-                    self.player.release_jump()
+                    self.world.player.release_jump()
 
         # Get pressed keys for movement
         keys = pygame.key.get_pressed()
@@ -68,49 +60,24 @@ class Game:
         right = keys[pygame.K_RIGHT] or keys[pygame.K_d]
         
         # Use player's move method
-        self.player.move(left, right)
+        self.world.player.move(left, right)
             
     def update(self):
-        """Update game physics"""
-        # Check for death first
-        if self.player.rect.y > GROUND_LEVEL:
-            self.world.player_die(self.player)
-            
-        # If death animation is playing, only update player
-        if self.player.is_death_animating:
-            self.player.update()
-            # Check if player has fallen far enough to reset
-            if self.player.rect.y > GROUND_LEVEL + 500:  # Wait until player falls well below screen
-                if self.world.lives <= 0:
-                    self.running = False
-                else:
-                    self.player.is_death_animating = False
-                    self.player.is_dead = False
-                    self.player.can_move = True
-                    self.player.rect.x, self.player.rect.y = self.world.spawn_point
-                    self.player.velocity_y = 0
-                    self.player.velocity_x = 0
-            return
+        """Update game"""
         
-        self.world.update(self.player)
-        self.player.update()
-            
-        # Prevent player moving off screen
-        if self.player.rect.left < 0:
-            self.player.rect.left = 0
-            
-        # Update camera to follow player
-        self.camera.update(self.player)
+        # Update world (player within)
+        self.world.update()
+        
+        if self.world.is_gameover:
+            self.game_state = MENU
+            self.world = World()
         
     def draw(self):
         """Draw game objects"""
         self.screen.fill((0, 0, 0))
 
-        # Draw world
-        self.world.draw(self.screen, self.camera)
-
-        # Draw player
-        self.player.draw(self.screen, self.camera)
+        # Draw world (player within)
+        self.world.draw(self.screen)
         
         # Draw UI elements
         score_text = self.font.render(f'Score: {self.world.score}', True, (255, 255, 255))
