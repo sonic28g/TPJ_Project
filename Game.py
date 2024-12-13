@@ -1,10 +1,10 @@
 import pygame
-from Camera import Camera
+from Settings import *
 from MainMenu import MainMenu
 from PauseMenu import PauseMenu
-from Settings import *
-from Block import *
 from World import World
+from TextManager import TextManager
+from UIManager import UIManager
 
 class Game:
     def __init__(self):
@@ -12,9 +12,6 @@ class Game:
         pygame.init()
         pygame.font.init()
         pygame.mixer.init()
-        
-        # UI font
-        self.font = pygame.font.Font('./assets/fonts/emulogic.ttf', 36)
 
         # Screen setup
         self.screen_width = SCREEN_WIDTH
@@ -35,7 +32,7 @@ class Game:
         self.fps = 60
         
         # World
-        self.world = World()
+        self.world = World(self.screen)
         
 
     def handle_events(self):
@@ -70,7 +67,7 @@ class Game:
         
         if self.world.is_gameover:
             self.game_state = MENU
-            self.world = World()
+            self.world = World(self.screen)
         
     def draw(self):
         """Draw game objects"""
@@ -78,13 +75,6 @@ class Game:
 
         # Draw world (player within)
         self.world.draw(self.screen)
-        
-        # Draw UI elements
-        score_text = self.font.render(f'Score: {self.world.score}', True, (255, 255, 255))
-        lives_text = self.font.render(f'Lives: {self.world.lives}', True, (255, 255, 255))
-        
-        self.screen.blit(score_text, (10, 10))
-        self.screen.blit(lives_text, (10, 50))
 
         pygame.display.flip()
 

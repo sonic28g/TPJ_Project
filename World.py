@@ -9,9 +9,11 @@ from Koopa import Koopa
 from Goomba import Goomba
 from Player import Player
 from Camera import Camera
+from TextManager import TextManager
+from UIManager import UIManager
 
 class World:
-    def __init__(self):
+    def __init__(self, screen):
         # Load background
         self.background = self.load_background()
         
@@ -22,8 +24,12 @@ class World:
         self.lives = 3
         
         # Game Over
-        self.is_gameover = False 
-
+        self.is_gameover = False
+        
+        # Text and UI Managers
+        self.TextManager = TextManager('./assets/fonts/emulogic.ttf', 36)
+        self.UIManager = UIManager(screen, self.TextManager)
+        
         # World elements
         self.platforms = [
             Platform(0, GROUND_LEVEL , 4134, 200), # First Platform
@@ -364,6 +370,16 @@ class World:
 
     def draw(self, screen):
         screen.blit(self.background, self.camera.camera)
+        
+        # Clear UI
+        self.UIManager.clear()
+        
+        # Add text elements
+        self.UIManager.add_text(f'Score: {self.score}', (10, 10))
+        self.UIManager.add_text(f'Lives: {self.lives}', (10, 50))
+        
+        # Draw UI
+        self.UIManager.draw()
         
         for platform in self.platforms:
             if self.camera.camera.colliderect(platform.rect):
