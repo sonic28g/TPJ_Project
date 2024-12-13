@@ -100,19 +100,41 @@ class BlockInt(Block):
         self.image = self.image.subsurface(32*3,0,32,32)
         self.image = pg.transform.scale(self.image, (60, 60))
         self.has_been_hit = False
-        
-    def reset(self):
-        self.has_been_hit = False
-        self.image = pg.image.load('assets/level/tiles.png').convert_alpha()
-        self.image = self.image.subsurface(32*3,0,32,32)
-        self.image = pg.transform.scale(self.image, (60, 60))
+        self.original_y = y
+        self.is_animating = False
+        self.animation_progress = 0
+        self.animation_speed = 2
+        self.max_offset = 15
+
+    def update(self):
+        if self.is_animating:
+            if self.animation_progress < self.max_offset:
+                self.rect.y = self.original_y - self.animation_progress
+                self.animation_progress += self.animation_speed
+            elif self.animation_progress < self.max_offset * 2:
+                self.rect.y = self.original_y - (self.max_offset * 2 - self.animation_progress)
+                self.animation_progress += self.animation_speed
+            else:
+                self.rect.y = self.original_y
+                self.is_animating = False
+                self.animation_progress = 0
 
     def hit(self):
         if not self.has_been_hit:
             self.has_been_hit = True
+            self.is_animating = True
             self.image = pg.image.load('assets/level/tiles.png').convert_alpha()
             self.image = self.image.subsurface(32*6,0,32,32)
             self.image = pg.transform.scale(self.image, (60, 60))
+
+    def reset(self):
+        self.has_been_hit = False
+        self.is_animating = False
+        self.animation_progress = 0
+        self.rect.y = self.original_y
+        self.image = pg.image.load('assets/level/tiles.png').convert_alpha()
+        self.image = self.image.subsurface(32*3,0,32,32)
+        self.image = pg.transform.scale(self.image, (60, 60))
 
 class BlockBrick(Block):
     def __init__(self, x, y):
