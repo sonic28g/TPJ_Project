@@ -293,6 +293,21 @@ class Game:
                         monster.rect.left = platform.rect.right
                         monster.velocity_x *= -1  # Reverse direction
             
+            # Apply pipe collisions for monsters
+            for tube in self.tubes:
+                if monster.rect.colliderect(tube.rect):
+                    # Monster landing on pipe
+                    if monster.velocity_y > 0 and monster.rect.bottom < tube.rect.centery:
+                        monster.rect.bottom = tube.rect.top
+                        monster.velocity_y = 0
+                    # Monster hitting pipe from sides
+                    elif monster.rect.right > tube.rect.left and monster.rect.left < tube.rect.left:
+                        monster.rect.right = tube.rect.left
+                        monster.velocity_x *= -1  # Reverse direction
+                    elif monster.rect.left < tube.rect.right and monster.rect.right > tube.rect.right:
+                        monster.rect.left = tube.rect.right
+                        monster.velocity_x *= -1  # Reverse direction
+            
             # Check collision with player
             if monster.rect.colliderect(self.player.rect):
                 # Player is above monster (stomping)
@@ -309,10 +324,6 @@ class Game:
                 elif monster.is_alive:  # Only die if monster is alive
                     # Player dies if touching monster from the side or below
                     self.player_die()
-        
-        # Remove dead Goombas that should be removed
-        self.monsters = [monster for monster in self.monsters 
-                        if not (isinstance(monster, Goomba) and monster.should_remove())]
             
         # Apply gravity
         self.player.velocity_y += self.GRAVITY
@@ -393,6 +404,15 @@ class Game:
         # Prevent moving off screen
         if self.player.rect.left < 0:
             self.player.rect.left = 0
+            
+        # Prevent monster from moving off screen
+        for monster in self.monsters:
+            if monster.rect.left < 0:
+                monster.rect.left = 0
+                monster.velocity_x *= -1
+            elif monster.rect.right > self.background.get_width():
+                monster.rect.right = self.background.get_width()
+                monster.velocity_x *= -1
 
         # Update camera to follow player
         self.camera.update(self.player)
