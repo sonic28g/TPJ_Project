@@ -100,6 +100,12 @@ class BlockInt(Block):
         self.image = self.image.subsurface(32*3,0,32,32)
         self.image = pg.transform.scale(self.image, (60, 60))
         self.has_been_hit = False
+        
+    def reset(self):
+        self.has_been_hit = False
+        self.image = pg.image.load('assets/level/tiles.png').convert_alpha()
+        self.image = self.image.subsurface(32*3,0,32,32)
+        self.image = pg.transform.scale(self.image, (60, 60))
 
     def hit(self):
         if not self.has_been_hit:

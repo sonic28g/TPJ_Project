@@ -185,7 +185,7 @@ class World:
             self.monsters.append(monster)
         # Reset blocks
         for block in self.blocks:
-            if isinstance(block, BlockBreak):
+            if isinstance(block, (BlockBreak, BlockInt)):
                 block.reset()
 
     def update(self):
