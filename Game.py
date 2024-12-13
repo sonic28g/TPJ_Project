@@ -2,7 +2,7 @@ import pygame
 import sys
 import os
 from Tube import Tube
-from camera import Camera
+from Camera import Camera
 from Player import Player
 from Platform import Platform
 from MainMenu import MainMenu

@@ -20,9 +20,11 @@ class Player:
         self.jump_force = 0
         
         # State attributes
+        self.is_dead = False
+        self.can_move = True
         self.is_jumping = False
-        self.facing_right = True
         self.is_walking = False
+        self.facing_right = True
         self.holding_jump = False
         
         # Animation handling
@@ -62,10 +64,24 @@ class Player:
             self.current_animation = 'idle'
             self.image = self.sprites['idle'][0]
             
+            # Load death sprite
+            sprite_path = os.path.join('assets', 'player', 'dead.png')
+            sprite = pygame.image.load(sprite_path).convert_alpha()
+            sprite = pygame.transform.scale(sprite, (64, 64))
+            self.sprites['dead'].append(sprite)
+            
         except pygame.error:
             print("Could not load player sprites. Using rectangle placeholder.")
             self.image = pygame.Surface((64, 64))
             self.image.fill(self.color)
+            
+    def die(self):
+        """Initialize player death sequence"""
+        self.is_dead = True
+        self.can_move = False
+        self.current_animation = 'dead'
+        self.current_sprite = 0
+        self.velocity_x = 0
     
     def move(self, left, right):
         """Handle horizontal movement with acceleration and friction"""
