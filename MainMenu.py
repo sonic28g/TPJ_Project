@@ -7,7 +7,7 @@ class MainMenu:
         self.screen_height = screen_height
         self.menu_options = ["Start Game", "Quit"]
         self.selected_option = 0
-        self.font = pygame.font.Font(None, 36)
+        self.font = pygame.font.Font('./assets/fonts/emulogic.ttf', 36)
 
     def handle_input(self):
         for event in pygame.event.get():

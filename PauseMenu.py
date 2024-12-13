@@ -7,7 +7,7 @@ class PauseMenu:
         self.screen_height = screen_height
         self.menu_options = ["Resume", "Restart", "Quit to Main Menu"]
         self.selected_option = 0
-        self.font = pygame.font.Font(None, 36)
+        self.font = pygame.font.Font('./assets/fonts/emulogic.ttf', 36)
         self.overlay = pygame.Surface((screen_width, screen_height))
         self.overlay.fill((0, 0, 0))
         self.overlay.set_alpha(128)

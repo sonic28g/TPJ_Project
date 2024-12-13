@@ -14,7 +14,7 @@ class Game:
         pygame.mixer.init()
         
         # UI font
-        self.font = pygame.font.Font(None, 36)
+        self.font = pygame.font.Font('./assets/fonts/emulogic.ttf', 36)
 
         # Screen setup
         self.screen_width = SCREEN_WIDTH
