@@ -1,5 +1,6 @@
 import pygame
 import os
+from Settings import *
 
 class Player:
     def __init__(self, x, y):
@@ -10,13 +11,8 @@ class Player:
         
         # Movement attributes
         self.speed = 5
-        self.min_jump_strength = 1
-        self.jump_strength = 17
         self.velocity_x = 0
         self.velocity_y = 0
-        self.acceleration = 0.5
-        self.friction = 0.40
-        self.max_speed = 10
         self.jump_force = 0
         
         # State attributes
@@ -28,7 +24,6 @@ class Player:
         self.holding_jump = False
         
         # Death animation attributes
-        self.death_jump_velocity = -15
         self.is_death_animating = False
         
         # Animation handling
@@ -87,7 +82,7 @@ class Player:
             self.current_animation = 'dead'
             self.current_sprite = 0
             self.velocity_x = 0
-            self.velocity_y = self.death_jump_velocity  # Apply initial upward velocity
+            self.velocity_y = DEATH_JUMP_VELOCITY  # Apply initial upward velocity
             self.is_death_animating = True
             # Immediately update to death sprite
             self.image = self.sprites['dead'][0]
@@ -101,22 +96,22 @@ class Player:
         
         # Apply acceleration based on input
         if right:
-            self.velocity_x = min(self.velocity_x + self.acceleration, self.max_speed)
+            self.velocity_x = min(self.velocity_x + ACCERLERATION, MAX_SPEED)
             self.facing_right = True
             self.is_walking = True
         elif left:
-            self.velocity_x = max(self.velocity_x - self.acceleration, -self.max_speed)
+            self.velocity_x = max(self.velocity_x - ACCERLERATION, - MAX_SPEED)
             self.facing_right = False
             self.is_walking = True
         else:
             self.is_walking = False
             # Apply friction when no input
-            if abs(self.velocity_x) < self.friction:
+            if abs(self.velocity_x) < FRICITION:
                 self.velocity_x = 0
             elif self.velocity_x > 0:
-                self.velocity_x -= self.friction
+                self.velocity_x -= FRICITION
             else:
-                self.velocity_x += self.friction
+                self.velocity_x += FRICITION
                 
         # Update position
         self.rect.x += int(self.velocity_x)
@@ -124,16 +119,16 @@ class Player:
     def jump(self):
         """Initiate jump if not already jumping"""
         if not self.is_jumping:
-            self.velocity_y = -self.min_jump_strength
+            self.velocity_y = -MIN_JUMP_STRENGTH
             self.is_jumping = True
             self.holding_jump = True
-            self.jump_force = self.min_jump_strength
+            self.jump_force = MIN_JUMP_STRENGTH
             self.current_animation = 'jump'
             self.current_sprite = 0
 
     def continue_jump(self):
         """Aumenta a força do salto enquanto o jogador segura o botão"""
-        if self.holding_jump and self.jump_force < self.jump_strength:
+        if self.holding_jump and self.jump_force < JUMP_STRENGHT:
             self.jump_force += 1  # Incrementa a força do salto
             self.velocity_y = -self.jump_force
 
