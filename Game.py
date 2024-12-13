@@ -7,6 +7,9 @@ from Player import Player
 from Platform import Platform
 from MainMenu import MainMenu
 from PauseMenu import PauseMenu
+from MonsterSpawner import MonsterSpawner
+from Goomba import Goomba
+from Koopa import Koopa
 from Settings import *
 from Block import *
 
@@ -27,6 +30,21 @@ class Game:
         self.screen_height = SCREEN_HEIGHT
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         pygame.display.set_caption(GAME_TITLE)
+        
+        # Initialize Monster System
+        self.monster_spawner = MonsterSpawner()
+        self.monsters = []
+        
+        # Store initial monster spawn points
+        self.monster_spawn_points = [
+            ('goomba', 1500, 600),
+            ('goomba', 2500, 600),
+            ('koopa', 3500, 600),
+            ('goomba', 4500, 600)
+        ]
+        
+        # Spawn initial monsters
+        self.spawn_initial_monsters()
         
         # Game state and Menus
         self.game_state = MENU
@@ -186,6 +204,16 @@ class Game:
 
         # Game state variables
         self.running = True
+        
+    def spawn_initial_monsters(self):
+        """Spawn initial monsters in the level"""
+        # Clear existing monsters
+        self.monsters = []
+        
+        # Spawn all monsters from spawn points
+        for monster_type, x, y in self.monster_spawn_points:
+            monster = self.monster_spawner.spawn_monster(monster_type, x, y)
+            self.monsters.append(monster)
 
     def handle_events(self):
         """Handle pygame events"""
@@ -216,7 +244,9 @@ class Game:
         if not self.player.is_death_animating:
             self.lives -= 1
             self.player.die()
-
+            # Reset all monsters to their initial positions
+            self.spawn_initial_monsters()
+            
     def update(self):
         """Update game physics"""
         # Check for death first
@@ -238,6 +268,51 @@ class Game:
                     self.player.velocity_y = 0
                     self.player.velocity_x = 0
             return
+        
+        # First update monsters
+        for monster in self.monsters:
+            # Update monster position
+            monster.update()
+            
+            # Apply platform collisions for monsters
+            for platform in self.platforms:
+                if monster.rect.colliderect(platform.rect):
+                    # Landing on platform
+                    if monster.velocity_y > 0:
+                        monster.rect.bottom = platform.rect.top
+                        monster.velocity_y = 0
+                    # Hitting platform from below
+                    elif monster.velocity_y < 0:
+                        monster.rect.top = platform.rect.bottom
+                        monster.velocity_y = 0
+                    # Hitting platform from sides
+                    elif monster.rect.right > platform.rect.left and monster.rect.left < platform.rect.left:
+                        monster.rect.right = platform.rect.left
+                        monster.velocity_x *= -1  # Reverse direction
+                    elif monster.rect.left < platform.rect.right and monster.rect.right > platform.rect.right:
+                        monster.rect.left = platform.rect.right
+                        monster.velocity_x *= -1  # Reverse direction
+            
+            # Check collision with player
+            if monster.rect.colliderect(self.player.rect):
+                # Player is above monster (stomping)
+                if (self.player.velocity_y > 0 and 
+                    self.player.rect.bottom < monster.rect.centery + 10):
+                    if isinstance(monster, Koopa) and monster.is_shell:
+                        # Kick shell
+                        direction = 1 if self.player.rect.centerx < monster.rect.centerx else -1
+                        monster.kick_shell(direction)
+                    else:
+                        monster.die()
+                        self.player.velocity_y = -10  # Bounce player up
+                        self.score += 100
+                elif monster.is_alive:  # Only die if monster is alive
+                    # Player dies if touching monster from the side or below
+                    self.player_die()
+        
+        # Remove dead Goombas that should be removed
+        self.monsters = [monster for monster in self.monsters 
+                        if not (isinstance(monster, Goomba) and monster.should_remove())]
             
         # Apply gravity
         self.player.velocity_y += self.GRAVITY
@@ -339,8 +414,9 @@ class Game:
 
         for block in self.blocks:
             block.draw(self.screen, self.camera)
-
-        print(self.player.rect)
+        
+        for monster in self.monsters:
+            monster.draw(self.screen, self.camera)
 
         # Draw player
         self.player.draw(self.screen, self.camera)
