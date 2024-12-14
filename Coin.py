@@ -18,8 +18,9 @@ class Coin(pg.sprite.Sprite):
         
         self.image = self.frames[0]
         self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        # Center the coin relative to the block position
+        self.rect.centerx = x + 30  # Half of block width (60/2)
+        self.rect.centery = y + 30  # Half of block height (60/2)
             
     def update(self):
         self.frame_index += self.animation_speed
