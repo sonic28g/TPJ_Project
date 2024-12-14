@@ -462,9 +462,10 @@ class World:
         # Draw UI
         self.UIManager.draw()
         
-        for platform in self.platforms:
+        # Only need to draw platforms for debbuging
+        """ for platform in self.platforms:
             if self.camera.camera.colliderect(platform.rect):
-                pygame.draw.rect(screen, (139, 69, 19), self.camera.apply_rect(platform.rect))
+                pygame.draw.rect(screen, (139, 69, 19), self.camera.apply_rect(platform.rect)) """
 
         for tube in self.tubes:
             tube.draw(screen, self.camera)
