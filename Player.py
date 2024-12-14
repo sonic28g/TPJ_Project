@@ -23,6 +23,7 @@ class Player:
         self.facing_right = True
         self.holding_jump = False
         self.is_big = False
+        self.has_flower = False
         
         # Animation attributes
         self.is_leveling_up = False
@@ -49,7 +50,8 @@ class Player:
             'walk': [],
             'jump': [],
             'dead': [],
-            'level_up': []
+            'level_up': [],
+            'flower': []
         }
         
         self.big_sprites = {
@@ -57,7 +59,8 @@ class Player:
             'walk': [],
             'jump': [],
             'dead': [],
-            'level_up': []
+            'level_up': [],
+            'flower': []
         }
         
         try:
@@ -67,26 +70,40 @@ class Player:
             sprite = pygame.transform.scale(sprite, (64, 64))
             self.small_sprites['idle'].append(sprite)
             
+            # Load walk Mario sprites
             for i in range(3):  
                 sprite_path = os.path.join('assets', 'player', f'run_{i}.png')
                 sprite = pygame.image.load(sprite_path).convert_alpha()
                 sprite = pygame.transform.scale(sprite, (64, 64))
                 self.small_sprites['walk'].append(sprite)
                 
+            # Load jump Mario sprites
             sprite_path = os.path.join('assets', 'player', 'jump_up.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
             sprite = pygame.transform.scale(sprite, (64, 64))
             self.small_sprites['jump'].append(sprite)
             
+            # Load dead Mario sprites
             sprite_path = os.path.join('assets', 'player', 'dead.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
             sprite = pygame.transform.scale(sprite, (64, 64))
             self.small_sprites['dead'].append(sprite)
             
+            # Load Mario level up sprites
             sprite_path = os.path.join('assets', 'player', 'mario_lvlup.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
             sprite = pygame.transform.scale(sprite, (64, 64))
             self.small_sprites['level_up'].append(sprite)
+            
+            # Load flower sprites (already big size)
+            sprite_path = os.path.join('assets', 'player', 'flower_idle.png')
+            sprite = pygame.image.load(sprite_path).convert_alpha()
+            self.big_sprites['flower'].append(sprite)
+            
+            for i in range(3):
+                sprite_path = os.path.join('assets', 'player', f'flower_run_{i}.png')
+                sprite = pygame.image.load(sprite_path).convert_alpha()
+                self.big_sprites['flower'].append(sprite)
             
             # Create big versions
             for animation in self.small_sprites:
@@ -132,12 +149,18 @@ class Player:
                 self.visible = True
     
     def take_damage(self):
+        if self.has_flower:
+            self.has_flower = False
+            self.invincible = True
+            self.invincible_timer = 0
+            return
+        
         if self.is_big and not self.is_taking_damage and not self.invincible:
             self.is_taking_damage = True
             self.animation_timer = 0
             self.can_move = False
-            self.velocity_x = -5 if self.facing_right else 5  # Knockback
-            self.velocity_y = -10  # Small upward bounce
+            self.velocity_x = -5 if self.facing_right else 5
+            self.velocity_y = -10
             self.current_animation = 'idle'
             self.current_sprite = 0
     
@@ -203,7 +226,6 @@ class Player:
         self.holding_jump = False
     
     def update(self):
-        """Update player state and animation"""
         if self.is_death_animating:
             self.image = self.sprites['dead'][0]
             self.velocity_y += 0.8
@@ -218,7 +240,12 @@ class Player:
         elif self.is_taking_damage:
             self.update_damage_animation()
         else:
-            if self.is_jumping:
+            if self.has_flower:
+                self.current_animation = 'flower'
+                self.current_sprite += self.animation_speed
+                if self.current_sprite >= len(self.sprites[self.current_animation]):
+                    self.current_sprite = 0
+            elif self.is_jumping:
                 self.current_animation = 'jump'
                 self.current_sprite = 0
             elif self.is_walking:
@@ -248,7 +275,7 @@ class Player:
             screen.blit(self.image, camera.apply(self))
         
     def grow(self):
-        """Make Mario big when collecting a mushroom"""
+        """Handle power-ups (mushroom or flower)"""
         if not self.is_big and not self.is_leveling_up:
             self.is_leveling_up = True
             self.animation_timer = 0
@@ -256,6 +283,10 @@ class Player:
             self.velocity_x = 0
             self.current_animation = 'level_up'
             self.current_sprite = 0
+        elif self.is_big and not self.has_flower:
+            self.has_flower = True
+            self.current_animation = 'flower'
+            self.animation_timer = 0
             
     def update_level_up_animation(self):
         self.animation_timer += 1

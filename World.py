@@ -56,7 +56,7 @@ class World:
         ]
 
         self.blocks = [
-            BlockInt(960,540, content='mushroom'),  # First mushroom for powerup
+            BlockInt(960,540, content='flower'),
             BlockBreak(1200,540),
             BlockInt(1260,540, content='coin'),
             BlockBreak(1320,540),
@@ -384,54 +384,64 @@ class World:
         
         # Update and check mushroom collisions
         for block in self.blocks:
-            if isinstance(block, BlockInt) and block.mushroom:
-                block.mushroom.update()
-                
-                # Check mushroom platform collisions
-                for platform in self.platforms:
-                    if block.mushroom.rect.colliderect(platform.rect):
-                        if block.mushroom.velocity_y > 0:
-                            block.mushroom.rect.bottom = platform.rect.top
-                            block.mushroom.velocity_y = 0
-                        elif block.mushroom.velocity_x > 0:
-                            block.mushroom.rect.right = platform.rect.left
-                            block.mushroom.velocity_x *= -1
-                        elif block.mushroom.velocity_x < 0:
-                            block.mushroom.rect.left = platform.rect.right
-                            block.mushroom.velocity_x *= -1
-
-                # Check mushroom tube collisions
-                for tube in self.tubes:
-                    if block.mushroom.rect.colliderect(tube.rect):
-                        if block.mushroom.velocity_y > 0:
-                            block.mushroom.rect.bottom = tube.rect.top
-                            block.mushroom.velocity_y = 0
-                        elif block.mushroom.rect.right > tube.rect.left and block.mushroom.rect.left < tube.rect.left:
-                            block.mushroom.rect.right = tube.rect.left
-                            block.mushroom.velocity_x *= -1
-                        elif block.mushroom.rect.left < tube.rect.right and block.mushroom.rect.right > tube.rect.right:
-                            block.mushroom.rect.left = tube.rect.right
-                            block.mushroom.velocity_x *= -1
-
-                # Check mushroom block collisions
-                if not block.mushroom.is_emerging:
-                    for other_block in self.blocks:
-                        if block.mushroom.rect.colliderect(other_block.rect):
+            if isinstance(block, BlockInt):
+                if block.mushroom:
+                    block.mushroom.update()
+                    
+                    # Check mushroom platform collisions
+                    for platform in self.platforms:
+                        if block.mushroom.rect.colliderect(platform.rect):
                             if block.mushroom.velocity_y > 0:
-                                block.mushroom.rect.bottom = other_block.rect.top
+                                block.mushroom.rect.bottom = platform.rect.top
                                 block.mushroom.velocity_y = 0
-                            elif block.mushroom.rect.right > other_block.rect.left and block.mushroom.rect.left < other_block.rect.left:
-                                block.mushroom.rect.right = other_block.rect.left
+                            elif block.mushroom.velocity_x > 0:
+                                block.mushroom.rect.right = platform.rect.left
                                 block.mushroom.velocity_x *= -1
-                            elif block.mushroom.rect.left < other_block.rect.right and block.mushroom.rect.right > other_block.rect.right:
-                                block.mushroom.rect.left = other_block.rect.right
+                            elif block.mushroom.velocity_x < 0:
+                                block.mushroom.rect.left = platform.rect.right
                                 block.mushroom.velocity_x *= -1
+
+                    # Check mushroom tube collisions
+                    for tube in self.tubes:
+                        if block.mushroom.rect.colliderect(tube.rect):
+                            if block.mushroom.velocity_y > 0:
+                                block.mushroom.rect.bottom = tube.rect.top
+                                block.mushroom.velocity_y = 0
+                            elif block.mushroom.rect.right > tube.rect.left and block.mushroom.rect.left < tube.rect.left:
+                                block.mushroom.rect.right = tube.rect.left
+                                block.mushroom.velocity_x *= -1
+                            elif block.mushroom.rect.left < tube.rect.right and block.mushroom.rect.right > tube.rect.right:
+                                block.mushroom.rect.left = tube.rect.right
+                                block.mushroom.velocity_x *= -1
+
+                    # Check mushroom block collisions
+                    if not block.mushroom.is_emerging:
+                        for other_block in self.blocks:
+                            if block.mushroom.rect.colliderect(other_block.rect):
+                                if block.mushroom.velocity_y > 0:
+                                    block.mushroom.rect.bottom = other_block.rect.top
+                                    block.mushroom.velocity_y = 0
+                                elif block.mushroom.rect.right > other_block.rect.left and block.mushroom.rect.left < other_block.rect.left:
+                                    block.mushroom.rect.right = other_block.rect.left
+                                    block.mushroom.velocity_x *= -1
+                                elif block.mushroom.rect.left < other_block.rect.right and block.mushroom.rect.right > other_block.rect.right:
+                                    block.mushroom.rect.left = other_block.rect.right
+                                    block.mushroom.velocity_x *= -1
+                
+                    # Check player collision with mushroom
+                    if block.mushroom.rect.colliderect(self.player.rect):
+                        block.mushroom = None
+                        self.player.grow()
+                        self.score += 1000
             
-                # Check player collision with mushroom
-                if block.mushroom.rect.colliderect(self.player.rect):
-                    block.mushroom = None
-                    self.player.grow()
-                    self.score += 1000
+                # Check player collision with flower 
+                if block.flower and block.flower.is_active:
+                    block.flower.update()
+                    # Check player collision with flower
+                    if block.flower.rect.colliderect(self.player.rect):
+                        block.flower = None
+                        self.player.grow()
+                        self.score += 1000
         
         # Update player
         self.player.update()
@@ -495,6 +505,8 @@ class World:
                 block.mushroom.draw(screen, self.camera)
             elif isinstance(block, BlockInt) and block.coin:
                 block.coin.draw(screen, self.camera)
+            elif isinstance(block, BlockInt) and block.flower:
+                block.flower.draw(screen, self.camera)
             
         
         self.player.draw(screen, self.camera)

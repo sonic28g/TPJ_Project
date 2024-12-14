@@ -1,6 +1,7 @@
 import pygame as pg
 from Settings import GROUND_LEVEL
 from Mushroom import Mushroom
+from Flower import Flower
 from Coin import Coin
 
 class Block(pg.sprite.Sprite):
@@ -118,6 +119,7 @@ class BlockInt(Block):
         self.max_offset = 15
         self.mushroom = None
         self.coin = None
+        self.flower = None
         self.content = content
 
     def update(self):
@@ -147,6 +149,9 @@ class BlockInt(Block):
             if self.content == 'mushroom' and not self.mushroom:
                 self.mushroom = Mushroom(self.rect.x, self.rect.y)
                 self.mushroom.activate()
+            elif self.content == 'flower' and not self.flower:
+                self.flower = Flower(self.rect.x, self.rect.y)
+                self.flower.activate()
             elif self.content == 'coin':
                 self.coin = Coin(self.rect.x, self.rect.y)
             self.image = pg.image.load('assets/level/tiles.png').convert_alpha()
@@ -161,6 +166,9 @@ class BlockInt(Block):
         self.frame_index = 0
         self.animation_timer = 0
         self.image = self.frames[0]
+        self.flower = None  # Reset flower
+        self.mushroom = None  # Reset mushroom
+        self.coin = None  # Reset coin
 
 class BlockBrick(Block):
     def __init__(self, x, y):
