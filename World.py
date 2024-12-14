@@ -172,10 +172,9 @@ class World:
 
     def player_die(self):
         """Handle player death"""
-        if not self.player.is_death_animating:
+        if not self.player.is_death_animating and not self.player.is_leveling_up:
             self.lives -= 1
             self.player.die()
-            # Reset all monsters to their initial positions
             self.spawn_initial_entities()
     
     def spawn_initial_entities(self):

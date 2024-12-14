@@ -143,15 +143,14 @@ class Player:
     
     def die(self):
         """Initialize player death sequence"""
-        if not self.is_death_animating:
+        if not self.is_death_animating and not self.is_leveling_up:  # Added check for level-up
             self.is_dead = True
             self.can_move = False
             self.current_animation = 'dead'
             self.current_sprite = 0
             self.velocity_x = 0
-            self.velocity_y = DEATH_JUMP_VELOCITY  # Apply initial upward velocity
+            self.velocity_y = DEATH_JUMP_VELOCITY
             self.is_death_animating = True
-            # Immediately update to death sprite
             self.image = self.sprites['dead'][0]
     
     def move(self, left, right):
