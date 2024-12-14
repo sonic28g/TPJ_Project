@@ -208,6 +208,7 @@ class World:
                     self.player.velocity_y = 0
                     self.player.velocity_x = 0
             return
+        
         # List for active monsters
         active_monsters = []
         
@@ -273,8 +274,12 @@ class World:
                             self.score += 100
                     elif monster.is_alive or (isinstance(monster, Koopa) and monster.is_shell and monster.velocity_x != 0):
                         # Player dies if touching monster from the side or below
-                        self.player_die()
-                        return
+                        # Player take damage if is_big is True
+                        if self.player.is_big:
+                            self.player.take_damage()
+                        else:
+                            self.player_die()
+                            return
                         
             # Keep the monster if it's still alive, is a Koopa shell, or is playing death animation
             if  monster.is_alive or isinstance(monster, Koopa) or (isinstance(monster, Goomba) and not monster.should_remove()):
@@ -372,7 +377,34 @@ class World:
                         elif block.mushroom.velocity_x < 0:
                             block.mushroom.rect.left = platform.rect.right
                             block.mushroom.velocity_x *= -1
-                
+
+                # Check mushroom tube collisions
+                for tube in self.tubes:
+                    if block.mushroom.rect.colliderect(tube.rect):
+                        if block.mushroom.velocity_y > 0:
+                            block.mushroom.rect.bottom = tube.rect.top
+                            block.mushroom.velocity_y = 0
+                        elif block.mushroom.rect.right > tube.rect.left and block.mushroom.rect.left < tube.rect.left:
+                            block.mushroom.rect.right = tube.rect.left
+                            block.mushroom.velocity_x *= -1
+                        elif block.mushroom.rect.left < tube.rect.right and block.mushroom.rect.right > tube.rect.right:
+                            block.mushroom.rect.left = tube.rect.right
+                            block.mushroom.velocity_x *= -1
+
+                # Check mushroom block collisions
+                if not block.mushroom.is_emerging:
+                    for other_block in self.blocks:
+                        if block.mushroom.rect.colliderect(other_block.rect):
+                            if block.mushroom.velocity_y > 0:
+                                block.mushroom.rect.bottom = other_block.rect.top
+                                block.mushroom.velocity_y = 0
+                            elif block.mushroom.rect.right > other_block.rect.left and block.mushroom.rect.left < other_block.rect.left:
+                                block.mushroom.rect.right = other_block.rect.left
+                                block.mushroom.velocity_x *= -1
+                            elif block.mushroom.rect.left < other_block.rect.right and block.mushroom.rect.right > other_block.rect.right:
+                                block.mushroom.rect.left = other_block.rect.right
+                                block.mushroom.velocity_x *= -1
+            
                 # Check player collision with mushroom
                 if block.mushroom.rect.colliderect(self.player.rect):
                     block.mushroom = None
