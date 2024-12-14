@@ -354,6 +354,31 @@ class World:
                 elif self.player.rect.left < tube.rect.right and self.player.rect.right > tube.rect.right:
                     self.player.rect.left = tube.rect.right
         
+        
+        # Update and check mushroom collisions
+        for block in self.blocks:
+            if isinstance(block, BlockInt) and block.mushroom:
+                block.mushroom.update()
+                
+                # Check mushroom platform collisions
+                for platform in self.platforms:
+                    if block.mushroom.rect.colliderect(platform.rect):
+                        if block.mushroom.velocity_y > 0:
+                            block.mushroom.rect.bottom = platform.rect.top
+                            block.mushroom.velocity_y = 0
+                        elif block.mushroom.velocity_x > 0:
+                            block.mushroom.rect.right = platform.rect.left
+                            block.mushroom.velocity_x *= -1
+                        elif block.mushroom.velocity_x < 0:
+                            block.mushroom.rect.left = platform.rect.right
+                            block.mushroom.velocity_x *= -1
+                
+                # Check player collision with mushroom
+                if block.mushroom.rect.colliderect(self.player.rect):
+                    block.mushroom = None
+                    self.player.grow()
+                    self.score += 1000
+        
         # Update player
         self.player.update()
         
@@ -402,5 +427,9 @@ class World:
 
         for monster in self.monsters:
             monster.draw(screen, self.camera)
+            
+        for block in self.blocks:
+            if isinstance(block, BlockInt) and block.mushroom:
+                block.mushroom.draw(screen, self.camera)
             
         self.player.draw(screen, self.camera)

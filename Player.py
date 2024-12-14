@@ -172,3 +172,15 @@ class Player:
         
         # Draw player sprite
         screen.blit(self.image, camera.apply(self))
+        
+    def grow(self):
+        """Make Mario big when collecting a mushroom"""
+        if not self.is_big:
+            self.is_big = True
+            self.rect.height = 96  # Taller collision box
+            # Load big Mario sprites
+            for animation in self.sprites:
+                for i, sprite in enumerate(self.sprites[animation]):
+                    self.sprites[animation][i] = pygame.transform.scale(sprite, (64, 96))
+            # Adjust position to account for new height
+            self.rect.y -= 32

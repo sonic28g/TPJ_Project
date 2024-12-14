@@ -1,5 +1,6 @@
 import pygame as pg
 from Settings import GROUND_LEVEL
+from Mushroom import Mushroom
 
 class Block(pg.sprite.Sprite):
     def __init__(self, x, y):
@@ -112,6 +113,7 @@ class BlockInt(Block):
         self.animation_progress = 0
         self.move_speed = 2
         self.max_offset = 15
+        self.mushroom = None  # Add this line
 
     def update(self):
         if not self.has_been_hit:
@@ -137,6 +139,9 @@ class BlockInt(Block):
         if not self.has_been_hit:
             self.has_been_hit = True
             self.is_animating = True
+            if not self.mushroom:
+                self.mushroom = Mushroom(self.rect.x, self.rect.y)
+                self.mushroom.activate()
             self.image = pg.image.load('assets/level/tiles.png').convert_alpha()
             self.image = self.image.subsurface(32*6, 0, 32, 32)
             self.image = pg.transform.scale(self.image, (60, 60))
