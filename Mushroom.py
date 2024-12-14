@@ -10,12 +10,21 @@ class Mushroom(pygame.sprite.Sprite):
         self.velocity_x = 3
         self.velocity_y = 0
         self.is_active = False
+        self.is_emerging = True
+        self.emergence_height = 0
         
     def update(self):
         if self.is_active:
-            self.velocity_y += GRAVITY
-            self.rect.x += self.velocity_x
-            self.rect.y += self.velocity_y
+            if self.is_emerging:
+                if self.emergence_height < 48:  # Height of mushroom
+                    self.rect.y -= 2
+                    self.emergence_height += 2
+                else:
+                    self.is_emerging = False
+            else:
+                self.velocity_y += GRAVITY
+                self.rect.x += self.velocity_x
+                self.rect.y += self.velocity_y
             
     def draw(self, screen, camera):
         if self.is_active:
