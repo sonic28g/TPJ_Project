@@ -455,6 +455,14 @@ class World:
         
         # Update player
         self.player.update()
+        
+        # Add victory collision checks here
+        if not self.level_complete:
+            if self.player.rect.colliderect(self.pole.rect):
+                self.pole_collision()
+            elif self.player.rect.colliderect(self.flag.rect):
+                self.flag_collision()
+        
         print(self.player.rect)
         
         # Prevent monster from moving off screen
@@ -474,8 +482,27 @@ class World:
         for block in self.blocks:
             block.update()
             
+        # Update flag
+        self.flag.update()  # Add check for flag reaching bottom
+        if self.player.is_sliding and not self.flag.is_sliding:
+            self.player.start_victory_walk()
+            
         # Update camera to follow player
         self.camera.update(self.player)
+
+    def pole_collision(self):
+        if not self.player.is_sliding:
+            self.player.start_pole_slide(self.pole.rect.centerx)
+            self.flag.start_slide()
+            
+    def flag_collision(self):
+        """Handle collision with the flag"""
+        if not self.player.victory_dance:
+            self.player.start_victory_walk()
+            self.level_complete = True
+            # Calculate time bonus
+            time_bonus = self.time * 50
+            self.score += time_bonus
 
     def draw(self, screen):
         screen.blit(self.background, self.camera.camera)

@@ -382,35 +382,35 @@ class Player:
     def start_pole_slide(self, pole_x):
         if not self.is_sliding:
             self.is_sliding = True
-            self.slide_x = pole_x - 30
+            self.slide_x = pole_x - 30  # Offset to grip pole
             self.velocity_x = 0
             self.velocity_y = self.slide_speed
             self.can_move = False
             self.current_sprite = 0
+            self.rect.x = self.slide_x  # Immediately snap to pole
             
-            # Initialize slide and victory sprites correctly
+            # Set correct sprites based on player state
             if self.has_flower:
-                self.slide_sprites = self.sprites['slide'][-2:]  # Use flower slide sprites
-                self.victory_sprites = self.sprites['walk']  # Use walk animation for victory
+                self.slide_sprites = self.sprites['slide'][-2:]
             elif self.is_big:
-                self.slide_sprites = self.sprites['slide'][:2]  # Use first two big slide sprites
-                self.victory_sprites = self.sprites['walk']  # Use walk animation for victory
+                self.slide_sprites = self.sprites['slide'][:2]
             else:
-                self.slide_sprites = self.sprites['slide']  # Use small slide sprites
-                self.victory_sprites = self.sprites['walk']  # Use walk animation for victory
+                self.slide_sprites = self.sprites['slide']
             
     def update_slide_animation(self):
         if self.is_sliding:
             self.rect.x = self.slide_x
-            
-            # Only continue sliding if not on ground
-            if self.velocity_y >= 0:  # Changed this line
+            if self.rect.bottom < GROUND_LEVEL - 32:
                 self.rect.y += self.slide_speed
                 self.current_sprite += 0.1
                 if self.current_sprite >= len(self.slide_sprites):
                     self.current_sprite = 0
                 self.image = self.slide_sprites[int(self.current_sprite)]
-                    
+            else:
+                self.rect.bottom = GROUND_LEVEL - 32  # Lock to ground
+                self.is_sliding = False  # Stop sliding
+                self.start_victory_walk()  # Start victory sequence
+                
         elif self.victory_dance:
             self.facing_right = True
             self.velocity_y += GRAVITY
@@ -431,6 +431,13 @@ class Player:
         self.can_move = False
         self.is_sliding = False
         self.velocity_y = -15  # Initial jump velocity
-        self.victory_walk_target = self.rect.x + 400  # Target x position to walk to
+        self.victory_walk_target = self.rect.x + 400  # Target x position
+        # Initialize victory sprites based on current state
+        if self.has_flower:
+            self.victory_sprites = self.sprites['walk'][-3:]  # Last 3 flower walk sprites
+        elif self.is_big:
+            self.victory_sprites = self.sprites['walk'][:3]  # First 3 big walk sprites
+        else:
+            self.victory_sprites = self.sprites['walk']  # Regular walk sprites
         
     

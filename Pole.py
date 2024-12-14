@@ -24,11 +24,18 @@ class Flag(pygame.sprite.Sprite):
         self.slide_speed = 3
         
     def update(self):
-        if self.is_sliding and self.rect.bottom < self.pole.rect.bottom:
-            self.rect.y += self.slide_speed
-            
+        if self.is_sliding:
+            if self.rect.bottom < self.pole.rect.bottom - 32:
+                self.rect.y += self.slide_speed
+            else:
+                self.is_sliding = False
+                # Signal to World that flag reached bottom
+                return True
+        return False
+
     def start_slide(self):
-        self.is_sliding = True
+        if not self.is_sliding:
+            self.is_sliding = True
         
     def draw(self, screen, camera):
         screen.blit(self.image, camera.apply(self))
