@@ -317,6 +317,10 @@ class World:
 
         # Check for collisions between player and blocks
         for block in self.blocks:
+            # Check if block is active for collision
+            if isinstance(block, BlockBreak) and not block.active:
+                continue
+            
             if self.player.rect.colliderect(block.rect):
                 # Check if the self.player is landing on the block
                 if (

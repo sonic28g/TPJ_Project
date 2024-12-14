@@ -24,6 +24,7 @@ class BlockBreak(Block):
         self.max_offset = 15
         self.is_broken = False
         self.debris_list = []
+        self.active = True
 
     def update(self):
         # Update debris first
@@ -52,10 +53,11 @@ class BlockBreak(Block):
             self.debris_list.append(debris)
 
     def hit(self, is_big):
-        if not self.is_animating and not self.is_broken:
+        if not self.is_animating and not self.is_broken and self.active:
             self.is_animating = True
             if is_big:
                 self.is_broken = True
+                self.active = False
                 self.create_debris()
 
     def reset(self):
