@@ -17,17 +17,18 @@ class World:
         # Load background
         self.background = self.load_background()
         
-        # Score
+        # Stats
         self.score = 0
-        
-        # Lives
         self.lives = 3
+        self.coins = 0
+        self.time = 400
+        self.timer = pygame.time.get_ticks()
         
         # Game Over
         self.is_gameover = False
         
         # Text and UI Managers
-        self.TextManager = TextManager('./assets/fonts/emulogic.ttf', 36)
+        self.TextManager = TextManager('./assets/fonts/emulogic.ttf', 28)
         self.UIManager = UIManager(screen, self.TextManager)
         
         # World elements
@@ -188,6 +189,13 @@ class World:
                 block.reset()
 
     def update(self):
+        current_time = pygame.time.get_ticks()
+        if current_time - self.timer >= 1000:  # Every second
+            self.time -= 1
+            self.timer = current_time
+            if self.time <= 0:
+                self.player_die()
+        
         # Check for death first
         if self.player.rect.y > GROUND_LEVEL:
             self.player_die()
@@ -439,10 +447,17 @@ class World:
         
         # Clear UI
         self.UIManager.clear()
+
+        # Left column
+        self.UIManager.add_text('MARIO', (PADDING, PADDING))
+        self.UIManager.add_text(f'{self.score:06d}', (PADDING, PADDING * 2.5))
         
-        # Add text elements
-        self.UIManager.add_text(f'Score: {self.score}', (10, 10))
-        self.UIManager.add_text(f'Lives: {self.lives}', (10, 50))
+        # Middle column  
+        self.UIManager.add_text(f'COINS: {self.coins:02d}', (COLUMN_WIDTH + PADDING, PADDING))
+
+        # Right column
+        self.UIManager.add_text('TIME', (2 * COLUMN_WIDTH + PADDING, PADDING))
+        self.UIManager.add_text(f'{self.time:03d}', (2 * COLUMN_WIDTH + PADDING, PADDING * 2.5))
         
         # Draw UI
         self.UIManager.draw()
@@ -464,4 +479,5 @@ class World:
             if isinstance(block, BlockInt) and block.mushroom:
                 block.mushroom.draw(screen, self.camera)
             
+        
         self.player.draw(screen, self.camera)

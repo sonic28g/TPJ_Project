@@ -25,3 +25,7 @@ GAME_OVER = "game_over"
 RESTART = "restart"
 QUIT_TO_MAIN_MENU = "quit_to_main_menu"
 ENDING = "ending"
+
+# UI settings
+PADDING = 20
+COLUMN_WIDTH = SCREEN_WIDTH // 3
