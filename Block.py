@@ -95,7 +95,7 @@ class BlockDebris(pg.sprite.Sprite):
         screen.blit(self.image, camera.apply(self))
 
 class BlockInt(Block):
-    def __init__(self, x, y):
+    def __init__(self, x, y, has_mushroom=False):
         super().__init__(x, y)
         self.tiles = pg.image.load('assets/level/tiles.png').convert_alpha()
         self.frames = [
@@ -113,7 +113,8 @@ class BlockInt(Block):
         self.animation_progress = 0
         self.move_speed = 2
         self.max_offset = 15
-        self.mushroom = None  # Add this line
+        self.mushroom = None
+        self.should_spawn_mushroom = has_mushroom
 
     def update(self):
         if not self.has_been_hit:
@@ -139,7 +140,7 @@ class BlockInt(Block):
         if not self.has_been_hit:
             self.has_been_hit = True
             self.is_animating = True
-            if not self.mushroom:
+            if self.should_spawn_mushroom and not self.mushroom:
                 self.mushroom = Mushroom(self.rect.x, self.rect.y)
                 self.mushroom.activate()
             self.image = pg.image.load('assets/level/tiles.png').convert_alpha()

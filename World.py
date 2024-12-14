@@ -56,7 +56,7 @@ class World:
         ]
 
         self.blocks = [
-            BlockInt(960,540),
+            BlockInt(960,540, has_mushroom=True),
             BlockBreak(1200,540),
             BlockInt(1260,540),
             BlockBreak(1320,540),
