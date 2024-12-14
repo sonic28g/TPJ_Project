@@ -340,7 +340,9 @@ class World:
                     and self.player.rect.left < block.rect.right - 5  # Avoid triggering on side collisions
                 ):
                     self.player.rect.top = block.rect.bottom
-                    self.player.velocity_y = GRAVITY  # Set a positive velocity to simulate falling
+                    self.player.velocity_y = GRAVITY  # Bounce down
+                    self.player.holding_jump = False  # Stop the jump charge
+                    self.player.jump_force = 0  # Reset jump force
                     if isinstance(block, (BlockInt, BlockBreak)):
                         if isinstance(block, BlockBreak):
                             block.hit(self.player.is_big)
