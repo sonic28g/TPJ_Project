@@ -253,7 +253,7 @@ class World:
                     if (self.player.velocity_y > 0 and self.player.rect.bottom < monster.rect.centery + 10):
                         if isinstance(monster, Koopa):
                             if not monster.is_shell:
-                                # Turn into shell instead of dying
+                                # Turn Koopa into shell instead of dying
                                 monster.convert_to_shell()
                                 self.player.velocity_y = -15
                                 self.score += 100
@@ -266,6 +266,7 @@ class World:
                                     # If shell is stopped, kick it
                                     direction = 1 if self.player.rect.centerx < monster.rect.centerx else -1
                                     monster.kick_shell(direction)
+                                    
                                 self.player.velocity_y = -10  # Add bounce when kicking shell
                                 self.score += 100
                         else:
