@@ -1,6 +1,7 @@
 import pygame as pg
 from Settings import GROUND_LEVEL
 from Mushroom import Mushroom
+from Coin import Coin
 
 class Block(pg.sprite.Sprite):
     def __init__(self, x, y):
@@ -95,7 +96,7 @@ class BlockDebris(pg.sprite.Sprite):
         screen.blit(self.image, camera.apply(self))
 
 class BlockInt(Block):
-    def __init__(self, x, y, has_mushroom=False):
+    def __init__(self, x, y, content=None):
         super().__init__(x, y)
         self.tiles = pg.image.load('assets/level/tiles.png').convert_alpha()
         self.frames = [
@@ -114,7 +115,8 @@ class BlockInt(Block):
         self.move_speed = 2
         self.max_offset = 15
         self.mushroom = None
-        self.should_spawn_mushroom = has_mushroom
+        self.coin = None
+        self.content = content
 
     def update(self):
         if not self.has_been_hit:
@@ -140,9 +142,11 @@ class BlockInt(Block):
         if not self.has_been_hit:
             self.has_been_hit = True
             self.is_animating = True
-            if self.should_spawn_mushroom and not self.mushroom:
+            if self.content == 'mushroom' and not self.mushroom:
                 self.mushroom = Mushroom(self.rect.x, self.rect.y)
                 self.mushroom.activate()
+            elif self.content == 'coin':
+                self.coin = Coin(self.rect.x, self.rect.y)
             self.image = pg.image.load('assets/level/tiles.png').convert_alpha()
             self.image = self.image.subsurface(32*6, 0, 32, 32)
             self.image = pg.transform.scale(self.image, (60, 60))

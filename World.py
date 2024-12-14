@@ -31,6 +31,13 @@ class World:
         self.TextManager = TextManager('./assets/fonts/emulogic.ttf', 28)
         self.UIManager = UIManager(screen, self.TextManager)
         
+        # Player
+        self.player = Player(300, 780)
+        self.spawn_point = (300, 780)
+        
+        # Camera
+        self.camera = Camera(SCREEN_WIDTH, SCREEN_HEIGHT)
+        
         # World elements
         self.platforms = [
             Platform(0, GROUND_LEVEL , 4134, 200), # First Platform
@@ -38,13 +45,6 @@ class World:
             Platform(5345, GROUND_LEVEL, 3829, 200), # Third Platform
             Platform(9305, GROUND_LEVEL, 3323, 200), # Fourth Platform
         ]
-        
-        # Player
-        self.player = Player(300, 780)
-        self.spawn_point = (300, 780)
-        
-        # Camera
-        self.camera = Camera(SCREEN_WIDTH, SCREEN_HEIGHT)
         
         self.tubes = [
             Tube(1676,660),
@@ -56,9 +56,9 @@ class World:
         ]
 
         self.blocks = [
-            BlockInt(960,540, has_mushroom=True),
+            BlockInt(960,540, content='mushroom'),
             BlockBreak(1200,540),
-            BlockInt(1260,540),
+            BlockInt(1260,540, content='coin'),
             BlockBreak(1320,540),
             BlockInt(1380,540),
             BlockBreak(1440,540),
@@ -145,6 +145,11 @@ class World:
             BlockBrick(11340,660),
             BlockBrick(11340,720),
         ]
+
+        for block in self.blocks:
+            if isinstance(block, BlockInt):
+                block.world = self
+                
 
         # Monster System
         self.monster_spawner = MonsterSpawner()
@@ -349,6 +354,14 @@ class World:
                 # Check for right-side collision
                 elif self.player.rect.left < block.rect.right and self.player.rect.right > block.rect.right:
                     self.player.rect.left = block.rect.right
+                    
+            # Update coins
+            if isinstance(block, BlockInt) and block.coin:
+                block.coin.update()
+                if block.coin.is_collected:
+                    self.coins += 1
+                    self.score += 200
+                    block.coin = None
 
         # Check for collisions between player and tubes
         for tube in self.tubes:
@@ -479,6 +492,8 @@ class World:
         for block in self.blocks:
             if isinstance(block, BlockInt) and block.mushroom:
                 block.mushroom.draw(screen, self.camera)
+            elif isinstance(block, BlockInt) and block.coin:
+                block.coin.draw(screen, self.camera)
             
         
         self.player.draw(screen, self.camera)
