@@ -6,7 +6,9 @@ class Mushroom(pygame.sprite.Sprite):
         super().__init__()
         self.image = pygame.image.load('assets/items/mushroom.png').convert_alpha()
         self.image = pygame.transform.scale(self.image, (48, 48))
-        self.rect = self.image.get_rect(x=x, y=y)
+        self.rect = self.image.get_rect()
+        self.rect.centerx = x + 30
+        self.rect.centery = y + 30
         self.velocity_x = 3
         self.velocity_y = 0
         self.is_active = False
@@ -16,7 +18,7 @@ class Mushroom(pygame.sprite.Sprite):
     def update(self):
         if self.is_active:
             if self.is_emerging:
-                if self.emergence_height < 48:  # Height of mushroom
+                if self.emergence_height < 48:
                     self.rect.y -= 2
                     self.emergence_height += 2
                 else:
