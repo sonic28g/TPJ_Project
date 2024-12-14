@@ -32,7 +32,8 @@ class World:
         self.UIManager = UIManager(screen, self.TextManager)
         
         # Player
-        self.player = Player(300, 780)
+        # Change player spawn point to the first platform later
+        self.player = Player(11660, 780)
         self.spawn_point = (300, 780)
         
         # Camera
@@ -144,6 +145,7 @@ class World:
             BlockBrick(11340,600),
             BlockBrick(11340,660),
             BlockBrick(11340,720),
+            BlockBrick(11880, 720),
         ]
                 
         # Monster System
@@ -445,6 +447,7 @@ class World:
         
         # Update player
         self.player.update()
+        print(self.player.rect)
         
         # Prevent monster from moving off screen
         for monster in self.monsters:
