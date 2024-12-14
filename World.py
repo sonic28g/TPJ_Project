@@ -145,12 +145,7 @@ class World:
             BlockBrick(11340,660),
             BlockBrick(11340,720),
         ]
-
-        for block in self.blocks:
-            if isinstance(block, BlockInt):
-                block.world = self
                 
-
         # Monster System
         self.monster_spawner = MonsterSpawner()
         self.monsters = []
