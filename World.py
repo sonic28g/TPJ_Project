@@ -11,6 +11,7 @@ from Player import Player
 from Camera import Camera
 from TextManager import TextManager
 from UIManager import UIManager
+from Pole import Pole, Flag
 
 class World:
     def __init__(self, screen):
@@ -26,6 +27,9 @@ class World:
         
         # Game Over
         self.is_gameover = False
+        
+        # Level Complete
+        self.level_complete = False
         
         # Text and UI Managers
         self.TextManager = TextManager('./assets/fonts/emulogic.ttf', 28)
@@ -158,6 +162,10 @@ class World:
         ]
         
         self.spawn_initial_entities()
+        
+        # Victory flag
+        self.pole = Pole(11891, 720)
+        self.flag = Flag(self.pole)
 
     def load_background(self):
         try:
@@ -511,5 +519,7 @@ class World:
             elif isinstance(block, BlockInt) and block.flower:
                 block.flower.draw(screen, self.camera)
             
+        self.pole.draw(screen, self.camera)
+        self.flag.draw(screen, self.camera)
         
         self.player.draw(screen, self.camera)

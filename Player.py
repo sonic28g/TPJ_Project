@@ -34,7 +34,15 @@ class Player:
         self.invincible = False
         self.invincible_timer = 0
         self.invincible_duration = 120
-        self.visible = True  # For damage flicker effect
+        self.visible = True
+        
+        # Attributes for pole slide animation
+        self.is_sliding = False
+        self.slide_speed = 3
+        self.slide_x = 0
+        self.victory_dance = False
+        self.slide_sprites = []
+        self.victory_sprites = []
         
         # Death animation attributes
         self.is_death_animating = False
@@ -51,7 +59,8 @@ class Player:
             'jump': [],
             'dead': [],
             'level_up': [],
-            'flower': []
+            'flower': [],
+            'slide': []
         }
         
         self.big_sprites = {
@@ -60,11 +69,12 @@ class Player:
             'jump': [],
             'dead': [],
             'level_up': [],
-            'flower': []
+            'flower': [],
+            'slide': []
         }
         
         try:
-            # Load small Mario sprites
+            # Load small Mario idle sprite
             sprite_path = os.path.join('assets', 'player', 'idle.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
             sprite = pygame.transform.scale(sprite, (64, 64))
@@ -83,6 +93,17 @@ class Player:
             sprite = pygame.transform.scale(sprite, (64, 64))
             self.small_sprites['jump'].append(sprite)
             
+            # Load slide sprites
+            sprite_path = os.path.join('assets', 'player', 'mario_slide_0.png')
+            sprite = pygame.image.load(sprite_path).convert_alpha()
+            sprite = pygame.transform.scale(sprite, (64, 64))
+            self.small_sprites['slide'].append(sprite)
+            
+            sprite_path = os.path.join('assets', 'player', 'mario_slide_1.png')
+            sprite = pygame.image.load(sprite_path).convert_alpha()
+            sprite = pygame.transform.scale(sprite, (64, 64))
+            self.small_sprites['slide'].append(sprite)
+            
             # Load dead Mario sprites
             sprite_path = os.path.join('assets', 'player', 'dead.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
@@ -94,6 +115,42 @@ class Player:
             sprite = pygame.image.load(sprite_path).convert_alpha()
             sprite = pygame.transform.scale(sprite, (64, 64))
             self.small_sprites['level_up'].append(sprite)
+                    
+            # Load big Mario idle sprite
+            sprite_path = os.path.join('assets', 'player', 'big_idle.png')
+            sprite = pygame.image.load(sprite_path).convert_alpha()
+            sprite = pygame.transform.scale(sprite, (64, 96))
+            self.big_sprites['idle'].append(sprite)
+            
+            # Load big walk Mario sprites
+            for i in range(3):
+                sprite_path = os.path.join('assets', 'player', f'big_run_{i}.png')
+                sprite = pygame.image.load(sprite_path).convert_alpha()
+                sprite = pygame.transform.scale(sprite, (64, 96))
+                self.big_sprites['walk'].append(sprite)
+                
+            # Load big jump Mario sprites
+            sprite_path = os.path.join('assets', 'player', 'big_jump.png')
+            sprite = pygame.image.load(sprite_path).convert_alpha()
+            sprite = pygame.transform.scale(sprite, (64, 96))
+            self.big_sprites['jump'].append(sprite)
+                    
+            # Create big Mario dead sprite converting the small on
+            sprite_path = os.path.join('assets', 'player', 'dead.png')
+            sprite = pygame.image.load(sprite_path).convert_alpha()
+            sprite = pygame.transform.scale(sprite, (64, 96))
+            self.big_sprites['dead'].append(sprite)
+            
+            # Load big Mario slide sprites
+            sprite_path = os.path.join('assets', 'player', 'big_slide_0.png')
+            sprite = pygame.image.load(sprite_path).convert_alpha()
+            sprite = pygame.transform.scale(sprite, (64, 96))
+            self.big_sprites['slide'].append(sprite)
+            
+            sprite_path = os.path.join('assets', 'player', 'big_slide_1.png')
+            sprite = pygame.image.load(sprite_path).convert_alpha()
+            sprite = pygame.transform.scale(sprite, (64, 96))
+            self.big_sprites['slide'].append(sprite)
             
             # Load flower sprites (already big size)
             sprite_path = os.path.join('assets', 'player', 'flower_idle.png')
@@ -104,11 +161,15 @@ class Player:
                 sprite_path = os.path.join('assets', 'player', f'flower_run_{i}.png')
                 sprite = pygame.image.load(sprite_path).convert_alpha()
                 self.big_sprites['flower'].append(sprite)
+                
+            # Load flower Mario slide
+            sprite_path = os.path.join('assets', 'player', 'flower_slide_0.png')
+            sprite = pygame.image.load(sprite_path).convert_alpha()
+            self.big_sprites['slide'].append(sprite)
             
-            # Create big versions
-            for animation in self.small_sprites:
-                for sprite in self.small_sprites[animation]:
-                    self.big_sprites[animation].append(pygame.transform.scale(sprite, (64, 96)))
+            sprite_path = os.path.join('assets', 'player', 'flower_slide_1.png')
+            sprite = pygame.image.load(sprite_path).convert_alpha()
+            self.big_sprites['slide'].append(sprite)
             
             self.current_animation = 'idle'
             self.sprites = self.small_sprites
@@ -179,8 +240,8 @@ class Player:
     def move(self, left, right):
         """Handle horizontal movement with acceleration and friction"""
         
-        # Don't allow movement during death animation
-        if self.is_death_animating:
+        # Don't allow movement during death animation or sliding or victory dance
+        if self.is_death_animating or self.is_sliding or self.victory_dance:
             return
         
         # Apply acceleration based on input
@@ -207,6 +268,11 @@ class Player:
     
     def jump(self):
         """Initiate jump if not already jumping"""
+        
+        # Don't allow jump during death animation or sliding or victory dance
+        if self.is_death_animating or self.is_sliding or self.victory_dance:
+            return
+        
         if not self.is_jumping:
             self.velocity_y = -MIN_JUMP_STRENGTH
             self.is_jumping = True
@@ -226,6 +292,10 @@ class Player:
         self.holding_jump = False
     
     def update(self):
+        if self.is_sliding or self.victory_dance:
+            self.update_slide_animation()
+            return
+        
         if self.is_death_animating:
             self.image = self.sprites['dead'][0]
             self.velocity_y += 0.8
@@ -308,3 +378,59 @@ class Player:
             self.is_big = True
             self.rect.height = 96
             self.current_animation = 'idle'
+            
+    def start_pole_slide(self, pole_x):
+        if not self.is_sliding:
+            self.is_sliding = True
+            self.slide_x = pole_x - 30
+            self.velocity_x = 0
+            self.velocity_y = self.slide_speed
+            self.can_move = False
+            self.current_sprite = 0
+            
+            # Initialize slide and victory sprites correctly
+            if self.has_flower:
+                self.slide_sprites = self.sprites['slide'][-2:]  # Use flower slide sprites
+                self.victory_sprites = self.sprites['walk']  # Use walk animation for victory
+            elif self.is_big:
+                self.slide_sprites = self.sprites['slide'][:2]  # Use first two big slide sprites
+                self.victory_sprites = self.sprites['walk']  # Use walk animation for victory
+            else:
+                self.slide_sprites = self.sprites['slide']  # Use small slide sprites
+                self.victory_sprites = self.sprites['walk']  # Use walk animation for victory
+            
+    def update_slide_animation(self):
+        if self.is_sliding:
+            self.rect.x = self.slide_x
+            
+            # Only continue sliding if not on ground
+            if self.velocity_y >= 0:  # Changed this line
+                self.rect.y += self.slide_speed
+                self.current_sprite += 0.1
+                if self.current_sprite >= len(self.slide_sprites):
+                    self.current_sprite = 0
+                self.image = self.slide_sprites[int(self.current_sprite)]
+                    
+        elif self.victory_dance:
+            self.facing_right = True
+            self.velocity_y += GRAVITY
+            self.rect.y += self.velocity_y
+            
+            if self.rect.x < self.victory_walk_target:
+                self.rect.x += 3
+                self.current_sprite += 0.1
+                if self.current_sprite >= len(self.victory_sprites):
+                    self.current_sprite = 0
+                self.image = self.victory_sprites[int(self.current_sprite)]
+            else:
+                self.image = self.sprites['idle'][0]
+            
+    def start_victory_walk(self):
+        """Start victory sequence when flag is collected"""
+        self.victory_dance = True
+        self.can_move = False
+        self.is_sliding = False
+        self.velocity_y = -15  # Initial jump velocity
+        self.victory_walk_target = self.rect.x + 400  # Target x position to walk to
+        
+    
