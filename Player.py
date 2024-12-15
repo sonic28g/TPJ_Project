@@ -6,7 +6,7 @@ class Player:
     def __init__(self, x, y):
         """Initialize player attributes"""
         # Core attributes
-        self.rect = pygame.Rect(x, y, 64, 64)
+        self.rect = pygame.Rect(x, y, 60, 60)
         self.color = (255, 0, 0)  # Temporary color for collision box visualization
         
         # Movement attributes
@@ -87,112 +87,112 @@ class Player:
             # Load small Mario idle sprite
             sprite_path = os.path.join('assets', 'player', 'idle.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
-            sprite = pygame.transform.scale(sprite, (64, 64))
+            sprite = pygame.transform.scale(sprite, (60, 60))
             self.small_sprites['idle'].append(sprite)
             
             # Load walk Mario sprites
             for i in range(3):  
                 sprite_path = os.path.join('assets', 'player', f'run_{i}.png')
                 sprite = pygame.image.load(sprite_path).convert_alpha()
-                sprite = pygame.transform.scale(sprite, (64, 64))
+                sprite = pygame.transform.scale(sprite, (60, 60))
                 self.small_sprites['walk'].append(sprite)
                 
             # Load jump Mario sprites
             sprite_path = os.path.join('assets', 'player', 'jump_up.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
-            sprite = pygame.transform.scale(sprite, (64, 64))
+            sprite = pygame.transform.scale(sprite, (60, 60))
             self.small_sprites['jump'].append(sprite)
             
             # Load slide sprites
             sprite_path = os.path.join('assets', 'player', 'mario_slide_0.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
-            sprite = pygame.transform.scale(sprite, (64, 64))
+            sprite = pygame.transform.scale(sprite, (60, 60))
             self.small_sprites['slide'].append(sprite)
             
             sprite_path = os.path.join('assets', 'player', 'mario_slide_1.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
-            sprite = pygame.transform.scale(sprite, (64, 64))
+            sprite = pygame.transform.scale(sprite, (60, 60))
             self.small_sprites['slide'].append(sprite)
             
             # Load dead Mario sprites
             sprite_path = os.path.join('assets', 'player', 'dead.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
-            sprite = pygame.transform.scale(sprite, (64, 64))
+            sprite = pygame.transform.scale(sprite, (60, 60))
             self.small_sprites['dead'].append(sprite)
             
             # Load Mario level up sprite
             sprite_path = os.path.join('assets', 'player', 'mario_lvlup.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
             
-            small_sprite = pygame.transform.scale(sprite, (64, 64))
+            small_sprite = pygame.transform.scale(sprite, (60, 60))
             self.small_sprites['level_up'].append(small_sprite)
             
-            big_sprite = pygame.transform.scale(sprite, (64, 96))
+            big_sprite = pygame.transform.scale(sprite, (60, 120))
             self.big_sprites['level_up'].append(big_sprite)
                     
             # Load big Mario idle sprite
             sprite_path = os.path.join('assets', 'player', 'big_idle.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
-            sprite = pygame.transform.scale(sprite, (64, 96))
+            sprite = pygame.transform.scale(sprite, (60, 120))
             self.big_sprites['idle'].append(sprite)
             
             # Load big walk Mario sprites
             for i in range(3):
                 sprite_path = os.path.join('assets', 'player', f'big_run_{i}.png')
                 sprite = pygame.image.load(sprite_path).convert_alpha()
-                sprite = pygame.transform.scale(sprite, (64, 96))
+                sprite = pygame.transform.scale(sprite, (60, 120))
                 self.big_sprites['walk'].append(sprite)
                 
             # Load big jump Mario sprites
             sprite_path = os.path.join('assets', 'player', 'big_jump.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
-            sprite = pygame.transform.scale(sprite, (64, 96))
+            sprite = pygame.transform.scale(sprite, (60, 120))
             self.big_sprites['jump'].append(sprite)
                     
             # Create big Mario dead sprite converting the small on
             sprite_path = os.path.join('assets', 'player', 'dead.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
-            sprite = pygame.transform.scale(sprite, (64, 96))
+            sprite = pygame.transform.scale(sprite, (60, 120))
             self.big_sprites['dead'].append(sprite)
             
             # Load big Mario slide sprites
             sprite_path = os.path.join('assets', 'player', 'big_slide_0.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
-            sprite = pygame.transform.scale(sprite, (64, 96))
+            sprite = pygame.transform.scale(sprite, (60, 120))
             self.big_sprites['slide'].append(sprite)
             
             sprite_path = os.path.join('assets', 'player', 'big_slide_1.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
-            sprite = pygame.transform.scale(sprite, (64, 96))
+            sprite = pygame.transform.scale(sprite, (60, 120))
             self.big_sprites['slide'].append(sprite)
             
             # Load flower sprites (already big size)
             sprite_path = os.path.join('assets', 'player', 'flower_idle.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
-            sprite = pygame.transform.scale(sprite, (64, 96))
+            sprite = pygame.transform.scale(sprite, (60, 120))
             self.flower_sprites['idle'].append(sprite)
             
             for i in range(3):
                 sprite_path = os.path.join('assets', 'player', f'flower_run_{i}.png')
                 sprite = pygame.image.load(sprite_path).convert_alpha()
-                sprite = pygame.transform.scale(sprite, (64, 96))
+                sprite = pygame.transform.scale(sprite, (60, 120))
                 self.flower_sprites['walk'].append(sprite)
                 
             # Add flower jump sprite
             sprite_path = os.path.join('assets', 'player', 'flower_jump.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
-            sprite = pygame.transform.scale(sprite, (64, 96))
+            sprite = pygame.transform.scale(sprite, (60, 120))
             self.flower_sprites['jump'].append(sprite)
                 
             # Load flower Mario slide
             sprite_path = os.path.join('assets', 'player', 'flower_slide_0.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
-            sprite = pygame.transform.scale(sprite, (64, 96))
+            sprite = pygame.transform.scale(sprite, (60, 120))
             self.flower_sprites['slide'].append(sprite)
             
             sprite_path = os.path.join('assets', 'player', 'flower_slide_1.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
-            sprite = pygame.transform.scale(sprite, (64, 96))
+            sprite = pygame.transform.scale(sprite, (60, 120))
             self.flower_sprites['slide'].append(sprite)
             
             self.current_animation = 'idle'
@@ -201,7 +201,7 @@ class Player:
             
         except pygame.error as e:
             print(f"Could not load player sprites: {e}")
-            self.image = pygame.Surface((64, 64))
+            self.image = pygame.Surface((60, 60))
             self.image.fill(self.color)
     
     def update_damage_animation(self):
@@ -217,7 +217,7 @@ class Player:
             self.can_move = True
             self.sprites = self.small_sprites
             self.is_big = False
-            self.rect.height = 64
+            self.rect.height = 60
             self.visible = True
             self.current_animation = 'idle'
             self.invincible = True
@@ -397,12 +397,12 @@ class Player:
         if self.animation_timer % self.flicker_rate == 0:
             if self.sprites == self.small_sprites:
                 self.sprites = self.big_sprites
-                self.rect.height = 96
+                self.rect.height = 120
                 self.rect.y -= 32
                 self.image = self.sprites['idle'][0]  # Use idle sprite for big Mario
             else:
                 self.sprites = self.small_sprites
-                self.rect.height = 64
+                self.rect.height = 60
                 self.rect.y += 32
                 self.image = self.sprites['level_up'][0]  # Use level up sprite for small Mario
         
@@ -411,7 +411,7 @@ class Player:
             self.can_move = True
             self.sprites = self.big_sprites
             self.is_big = True
-            self.rect.height = 96
+            self.rect.height = 120
             self.current_animation = 'idle'
             
     def start_pole_slide(self, pole_x):
