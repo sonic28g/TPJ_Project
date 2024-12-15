@@ -93,6 +93,8 @@ class Game:
                 
             elif self.game_state == PAUSED:
                 self.game_state = self.pause_menu.handle_input()
+                if self.game_state == QUIT:
+                    self.running = False
                 self.draw()
                 self.pause_menu.draw(self.screen)
                 if self.game_state == RESTART:
