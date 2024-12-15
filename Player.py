@@ -426,11 +426,11 @@ class Player:
             
             # Set correct sprites based on player state
             if self.has_flower:
-                self.slide_sprites = self.sprites['slide'][-2:]
+                self.slide_sprites = self.flower_sprites['slide']  # Use flower slide sprites
             elif self.is_big:
-                self.slide_sprites = self.sprites['slide'][:2]
+                self.slide_sprites = self.big_sprites['slide']  # Use big Mario slide sprites
             else:
-                self.slide_sprites = self.sprites['slide']
+                self.slide_sprites = self.small_sprites['slide']  # Use small Mario slide sprites
             
     def update_slide_animation(self):
         if self.is_sliding:
@@ -467,10 +467,12 @@ class Player:
         self.is_sliding = False
         self.velocity_y = -15  # Initial jump velocity
         self.victory_walk_target = self.rect.x + 400  # Target x position
+        
+        # Set correct sprites based on player state
         if self.has_flower:
-            self.victory_sprites = self.sprites['walk'][-3:]  # Last 3 flower walk sprites
+            self.victory_sprites = self.flower_sprites['walk']  # Use flower walk sprites
         elif self.is_big:
-            self.victory_sprites = self.sprites['walk'][:3]  # First 3 big walk sprites
+            self.victory_sprites = self.big_sprites['walk']  # Use big Mario walk sprites
         else:
-            self.victory_sprites = self.sprites['walk']  # Regular walk sprites
+            self.victory_sprites = self.small_sprites['walk']  # Use small Mario walk sprites
         
