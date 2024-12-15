@@ -110,11 +110,15 @@ class Player:
             sprite = pygame.transform.scale(sprite, (64, 64))
             self.small_sprites['dead'].append(sprite)
             
-            # Load Mario level up sprites
+            # Load Mario level up sprite
             sprite_path = os.path.join('assets', 'player', 'mario_lvlup.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
-            sprite = pygame.transform.scale(sprite, (64, 64))
-            self.small_sprites['level_up'].append(sprite)
+            
+            small_sprite = pygame.transform.scale(sprite, (64, 64))
+            self.small_sprites['level_up'].append(small_sprite)
+            
+            big_sprite = pygame.transform.scale(sprite, (64, 96))
+            self.big_sprites['level_up'].append(big_sprite)
                     
             # Load big Mario idle sprite
             sprite_path = os.path.join('assets', 'player', 'big_idle.png')
@@ -366,10 +370,12 @@ class Player:
                 self.sprites = self.big_sprites
                 self.rect.height = 96
                 self.rect.y -= 32
+                self.image = self.sprites['idle'][0]  # Use idle sprite for big Mario
             else:
                 self.sprites = self.small_sprites
                 self.rect.height = 64
                 self.rect.y += 32
+                self.image = self.sprites['level_up'][0]  # Use level up sprite for small Mario
         
         if self.animation_timer >= self.animation_duration:
             self.is_leveling_up = False
@@ -439,4 +445,3 @@ class Player:
         else:
             self.victory_sprites = self.sprites['walk']  # Regular walk sprites
         
-    

@@ -41,15 +41,17 @@ class PowerUpCollisionHandler(CollisionObserver):
     def _handle_player_collision(self, powerup, player):
         # Find the block that contains this powerup
         for block in self.world.blocks:
-            if isinstance(block, BlockInt):
-                if powerup == block.mushroom:
-                    block.mushroom = None
-                elif powerup == block.flower:
-                    block.flower = None
-                if block.mushroom is None and block.flower is None:
-                    player.grow()
-                    self.world.score += 1000
-                    break
+                if isinstance(block, BlockInt):
+                    if powerup == block.mushroom:
+                        block.mushroom = None  # Remove the mushroom
+                        player.grow()
+                        self.world.score += 1000
+                        break
+                    elif powerup == block.flower:
+                        block.flower = None  # Remove the flower
+                        player.grow()
+                        self.world.score += 1000
+                        break
                     
     def _handle_platform_collision(self, powerup, platform):
         if not isinstance(powerup, Mushroom):
