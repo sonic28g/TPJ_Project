@@ -64,7 +64,7 @@ class World:
         ]
 
         self.blocks = [
-            BlockInt(960,540, content='flower'),
+            BlockInt(960,540, content='mushroom'),
             BlockBreak(1200,540),
             BlockInt(1260,540, content='mushroom'),
             BlockBreak(1320,540),

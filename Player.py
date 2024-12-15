@@ -159,20 +159,24 @@ class Player:
             # Load flower sprites (already big size)
             sprite_path = os.path.join('assets', 'player', 'flower_idle.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
+            sprite = pygame.transform.scale(sprite, (64, 96))
             self.big_sprites['flower'].append(sprite)
             
             for i in range(3):
                 sprite_path = os.path.join('assets', 'player', f'flower_run_{i}.png')
                 sprite = pygame.image.load(sprite_path).convert_alpha()
+                sprite = pygame.transform.scale(sprite, (64, 96))
                 self.big_sprites['flower'].append(sprite)
                 
             # Load flower Mario slide
             sprite_path = os.path.join('assets', 'player', 'flower_slide_0.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
+            sprite = pygame.transform.scale(sprite, (64, 96))
             self.big_sprites['slide'].append(sprite)
             
             sprite_path = os.path.join('assets', 'player', 'flower_slide_1.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
+            sprite = pygame.transform.scale(sprite, (64, 96))
             self.big_sprites['slide'].append(sprite)
             
             self.current_animation = 'idle'
@@ -351,6 +355,7 @@ class Player:
     def grow(self):
         """Handle power-ups (mushroom or flower)"""
         if not self.is_big and not self.is_leveling_up:
+            # First mushroom makes Mario big
             self.is_leveling_up = True
             self.animation_timer = 0
             self.can_move = False
@@ -358,9 +363,10 @@ class Player:
             self.current_animation = 'level_up'
             self.current_sprite = 0
         elif self.is_big and not self.has_flower:
+            # Flower makes big Mario into flower Mario
             self.has_flower = True
             self.current_animation = 'flower'
-            self.animation_timer = 0
+            self.current_sprite = 0
             
     def update_level_up_animation(self):
         self.animation_timer += 1
