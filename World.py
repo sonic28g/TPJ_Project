@@ -13,6 +13,7 @@ from TextManager import TextManager
 from UIManager import UIManager
 from Pole import Pole, Flag
 from Powerup import Mushroom, Flower
+from CollisionSystem import CollisionSystem, PowerUpCollisionHandler
 
 class World:
     def __init__(self, screen):
@@ -37,9 +38,12 @@ class World:
         self.UIManager = UIManager(screen, self.TextManager)
         
         # Player
-        # Change player spawn point to the first platform later
         self.player = Player(300, 780)
         self.spawn_point = (300, 780)
+        
+        # Collision System
+        self.collision_system = CollisionSystem()
+        self.collision_system.add_observer(PowerUpCollisionHandler(self))
         
         # Camera
         self.camera = Camera(SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -392,65 +396,15 @@ class World:
                 elif self.player.rect.left < tube.rect.right and self.player.rect.right > tube.rect.right:
                     self.player.rect.left = tube.rect.right
         
-        
         # Update and check power-up collisions
         for block in self.blocks:
             if isinstance(block, BlockInt):
-                # Handle power-ups (mushroom or flower)
                 for powerup in [block.mushroom, block.flower]:
                     if powerup and powerup.is_active:
                         powerup.update()
-                        
-                        # Only check physical collisions for mushrooms
-                        if isinstance(powerup, Mushroom):
-                            # Platform collisions
-                            for platform in self.platforms:
-                                if powerup.rect.colliderect(platform.rect):
-                                    if powerup.velocity_y > 0:
-                                        powerup.rect.bottom = platform.rect.top
-                                        powerup.velocity_y = 0
-                                    elif powerup.velocity_x > 0:
-                                        powerup.rect.right = platform.rect.left
-                                        powerup.velocity_x *= -1
-                                    elif powerup.velocity_x < 0:
-                                        powerup.rect.left = platform.rect.right
-                                        powerup.velocity_x *= -1
-
-                            # Tube collisions
-                            for tube in self.tubes:
-                                if powerup.rect.colliderect(tube.rect):
-                                    if powerup.velocity_y > 0:
-                                        powerup.rect.bottom = tube.rect.top
-                                        powerup.velocity_y = 0
-                                    elif powerup.rect.right > tube.rect.left and powerup.rect.left < tube.rect.left:
-                                        powerup.rect.right = tube.rect.left
-                                        powerup.velocity_x *= -1
-                                    elif powerup.rect.left < tube.rect.right and powerup.rect.right > tube.rect.right:
-                                        powerup.rect.left = tube.rect.right
-                                        powerup.velocity_x *= -1
-                            
-                            # Block collisions
-                            if not powerup.is_emerging:
-                                for other_block in self.blocks:
-                                    if powerup.rect.colliderect(other_block.rect):
-                                        if powerup.velocity_y > 0:
-                                            powerup.rect.bottom = other_block.rect.top
-                                            powerup.velocity_y = 0
-                                        elif powerup.rect.right > other_block.rect.left and powerup.rect.left < other_block.rect.left:
-                                            powerup.rect.right = other_block.rect.left
-                                            powerup.velocity_x *= -1
-                                        elif powerup.rect.left < other_block.rect.right and powerup.rect.right > other_block.rect.right:
-                                            powerup.rect.left = other_block.rect.right
-                                            powerup.velocity_x *= -1
-
-                        # Check player collision for both types
-                        if powerup.rect.colliderect(self.player.rect):
-                            if powerup == block.mushroom:
-                                block.mushroom = None
-                            else:
-                                block.flower = None
-                            self.player.grow()
-                            self.score += 1000
+        
+        # Check Power-up collisions
+        self.collision_system.check_collisions(self)
         
         # Update player
         self.player.update()
