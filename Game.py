@@ -3,8 +3,7 @@ from Settings import *
 from MainMenu import MainMenu
 from PauseMenu import PauseMenu
 from World import World
-from TextManager import TextManager
-from UIManager import UIManager
+from Command import *
 
 class Game:
     def __init__(self):
@@ -18,6 +17,9 @@ class Game:
         self.screen_height = SCREEN_HEIGHT
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         pygame.display.set_caption(GAME_TITLE)
+        
+        # Input handler setup
+        self.input_handler = InputHandler()
         
         # Game state variables
         self.running = True
@@ -42,22 +44,16 @@ class Game:
                 self.running = False
             
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE and not self.world.player.is_jumping:
-                    self.world.player.jump()  
-                elif event.key == pygame.K_ESCAPE and self.game_state == PLAYING:
+                self.input_handler.handle_keydown(event, self.world.player)
+                if event.key == pygame.K_ESCAPE and self.game_state == PLAYING:
                     self.game_state = PAUSED
             
             if event.type == pygame.KEYUP:
-                if event.key == pygame.K_SPACE:
-                    self.world.player.release_jump()
+                self.input_handler.handle_keyup(event, self.world.player)
 
-        # Get pressed keys for movement
-        keys = pygame.key.get_pressed()
-        left = keys[pygame.K_LEFT] or keys[pygame.K_a]
-        right = keys[pygame.K_RIGHT] or keys[pygame.K_d]
-        
-        # Use player's move method
-        self.world.player.move(left, right)
+        # Handle continuous input (movement)
+        if self.game_state == PLAYING:
+            self.input_handler.handle_continuous_input(self.world.player)
             
     def update(self):
         """Update game"""

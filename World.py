@@ -37,7 +37,7 @@ class World:
         
         # Player
         # Change player spawn point to the first platform later
-        self.player = Player(11660, 780)
+        self.player = Player(300, 780)
         self.spawn_point = (300, 780)
         
         # Camera

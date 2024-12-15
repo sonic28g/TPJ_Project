@@ -432,7 +432,6 @@ class Player:
         self.is_sliding = False
         self.velocity_y = -15  # Initial jump velocity
         self.victory_walk_target = self.rect.x + 400  # Target x position
-        # Initialize victory sprites based on current state
         if self.has_flower:
             self.victory_sprites = self.sprites['walk'][-3:]  # Last 3 flower walk sprites
         elif self.is_big:
