@@ -1,7 +1,6 @@
 import pygame as pg
 from Settings import GROUND_LEVEL
-from Mushroom import Mushroom
-from Flower import Flower
+from Powerup import Mushroom, Flower
 from Coin import Coin
 
 class Block(pg.sprite.Sprite):
@@ -154,6 +153,7 @@ class BlockInt(Block):
                 self.flower.activate()
             elif self.content == 'coin':
                 self.coin = Coin(self.rect.x, self.rect.y)
+            # Update block appearance
             self.image = pg.image.load('assets/level/tiles.png').convert_alpha()
             self.image = self.image.subsurface(32*6, 0, 32, 32)
             self.image = pg.transform.scale(self.image, (60, 60))
