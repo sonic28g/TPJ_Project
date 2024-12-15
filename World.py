@@ -64,7 +64,7 @@ class World:
         ]
 
         self.blocks = [
-            BlockInt(960,540, content='mushroom'),
+            BlockInt(960,540, content='coin'),
             BlockBreak(1200,540),
             BlockInt(1260,540, content='mushroom'),
             BlockBreak(1320,540),
@@ -162,6 +162,9 @@ class World:
             ('goomba', 1500, GROUND_LEVEL),
             ('koopa', 2500, GROUND_LEVEL),
             ('goomba', 5500, GROUND_LEVEL),
+            ('goomba', 7000, GROUND_LEVEL),
+            ('koopa', 4500, GROUND_LEVEL),
+            ('goomba', 8000, GROUND_LEVEL),
         ]
         
         self.spawn_initial_entities()
@@ -172,7 +175,7 @@ class World:
 
     def load_background(self):
         try:
-            bg_path = os.path.join('assets', 'level/level.png')
+            bg_path = os.path.join('assets', 'level/level_without_bricks.png')
             original_bg = pygame.image.load(bg_path).convert()
             scale_factor = max(2400 / original_bg.get_width(), 1800 / original_bg.get_height())
             return pygame.transform.scale(original_bg, (
