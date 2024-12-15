@@ -141,7 +141,7 @@ class BlockInt(Block):
                 self.is_animating = False
                 self.animation_progress = 0
 
-    def hit(self, is_big=False):
+    def hit(self):
         if not self.has_been_hit:
             self.has_been_hit = True
             self.is_animating = True
@@ -153,6 +153,7 @@ class BlockInt(Block):
                 self.flower.activate()
             elif self.content == 'coin':
                 self.coin = Coin(self.rect.x, self.rect.y)
+            # Update block appearance
             self.image = pg.image.load('assets/level/tiles.png').convert_alpha()
             self.image = self.image.subsurface(32*6, 0, 32, 32)
             self.image = pg.transform.scale(self.image, (60, 60))
