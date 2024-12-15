@@ -64,7 +64,7 @@ class World:
         self.blocks = [
             BlockInt(960,540, content='flower'),
             BlockBreak(1200,540),
-            BlockInt(1260,540, content='coin'),
+            BlockInt(1260,540, content='mushroom'),
             BlockBreak(1320,540),
             BlockInt(1380,540, content='coin'),
             BlockBreak(1440,540),
@@ -401,7 +401,7 @@ class World:
                     if powerup and powerup.is_active:
                         powerup.update()
                         
-                        # Only check physical collisions for mushrooms (since flowers don't move)
+                        # Only check physical collisions for mushrooms
                         if isinstance(powerup, Mushroom):
                             # Platform collisions
                             for platform in self.platforms:

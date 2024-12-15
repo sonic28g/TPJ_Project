@@ -103,4 +103,4 @@ class Flower(PowerUp):
         self.image = self.sprites[int(self.current_sprite)]
     
     def _get_emergence_limit(self):
-        return 30
+        return 53
