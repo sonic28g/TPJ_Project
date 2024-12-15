@@ -3,6 +3,7 @@ from Settings import *
 from MainMenu import MainMenu
 from PauseMenu import PauseMenu
 from World import World
+from Camera import Camera
 from Command import *
 
 class Game:
@@ -25,6 +26,9 @@ class Game:
         self.running = True
         self.game_state = MENU
         
+        # Singleton Camera
+        self.camera = Camera.getInstance(self.screen_width, self.screen_height)
+        
         # Menus
         self.menu = MainMenu(self.screen_width, self.screen_height)
         self.pause_menu = PauseMenu(self.screen_width, self.screen_height)
@@ -34,9 +38,8 @@ class Game:
         self.fps = 60
         
         # World
-        self.world = World(self.screen)
+        self.world = World(self.screen, self.camera)
         
-
     def handle_events(self):
         """Handle pygame events"""
         for event in pygame.event.get():

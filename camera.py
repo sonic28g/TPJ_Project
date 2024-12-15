@@ -1,11 +1,26 @@
 import pygame
 
 class Camera:
+    __instance = None  # Private class-level variable for the singleton instance
+    
+    @staticmethod
+    def getInstance(width=None, height=None):
+        """Static access method to get the singleton instance"""
+        if Camera.__instance is None:
+            if width is None or height is None:
+                raise ValueError("Width and height must be provided for the first instantiation.")
+            Camera(width, height)  # Create the instance
+        return Camera.__instance
+    
     def __init__(self, width, height):
-        """Initialize camera"""
-        self.camera = pygame.Rect(0, 0, width, height)
-        self.width = width
-        self.height = height
+        """Private constructor for initializing the Camera"""
+        if Camera.__instance is not None:
+            raise Exception("This class is a singleton!")
+        else:
+            self.camera = pygame.Rect(0, 0, width, height)
+            self.width = width
+            self.height = height
+            Camera.__instance = self  # Set the singleton instance
 
     def apply(self, entity):
         """Apply camera offset to an entity"""

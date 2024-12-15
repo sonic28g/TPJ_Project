@@ -6,14 +6,13 @@ from Block import BlockInt, BlockBreak, BlockBrick
 from MonsterSpawner import MonsterSpawner
 from Settings import *
 from Player import Player
-from Camera import Camera
 from TextManager import TextManager
 from UIManager import UIManager
 from Pole import Pole, Flag
 from CollisionSystem import *
 
 class World:
-    def __init__(self, screen):
+    def __init__(self, screen, camera):
         # Load background
         self.background = self.load_background()
         
@@ -45,7 +44,7 @@ class World:
         self.collision_system.add_observer(MonsterCollisionHandler(self))
         
         # Camera
-        self.camera = Camera(SCREEN_WIDTH, SCREEN_HEIGHT)
+        self.camera = camera.getInstance(screen.get_width(), screen.get_height())
         
         # World elements
         self.platforms = [
