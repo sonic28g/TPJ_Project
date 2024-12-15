@@ -73,6 +73,16 @@ class Player:
             'slide': []
         }
         
+        self.flower_sprites = {
+            'idle': [],
+            'walk': [],
+            'jump': [],
+            'dead': [],
+            'level_up': [],
+            'flower': [],
+            'slide': []
+        }
+        
         try:
             # Load small Mario idle sprite
             sprite_path = os.path.join('assets', 'player', 'idle.png')
@@ -160,24 +170,30 @@ class Player:
             sprite_path = os.path.join('assets', 'player', 'flower_idle.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
             sprite = pygame.transform.scale(sprite, (64, 96))
-            self.big_sprites['flower'].append(sprite)
+            self.flower_sprites['idle'].append(sprite)
             
             for i in range(3):
                 sprite_path = os.path.join('assets', 'player', f'flower_run_{i}.png')
                 sprite = pygame.image.load(sprite_path).convert_alpha()
                 sprite = pygame.transform.scale(sprite, (64, 96))
-                self.big_sprites['flower'].append(sprite)
+                self.flower_sprites['walk'].append(sprite)
+                
+            # Add flower jump sprite
+            sprite_path = os.path.join('assets', 'player', 'flower_jump.png')
+            sprite = pygame.image.load(sprite_path).convert_alpha()
+            sprite = pygame.transform.scale(sprite, (64, 96))
+            self.flower_sprites['jump'].append(sprite)
                 
             # Load flower Mario slide
             sprite_path = os.path.join('assets', 'player', 'flower_slide_0.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
             sprite = pygame.transform.scale(sprite, (64, 96))
-            self.big_sprites['slide'].append(sprite)
+            self.flower_sprites['slide'].append(sprite)
             
             sprite_path = os.path.join('assets', 'player', 'flower_slide_1.png')
             sprite = pygame.image.load(sprite_path).convert_alpha()
             sprite = pygame.transform.scale(sprite, (64, 96))
-            self.big_sprites['slide'].append(sprite)
+            self.flower_sprites['slide'].append(sprite)
             
             self.current_animation = 'idle'
             self.sprites = self.small_sprites
@@ -319,26 +335,33 @@ class Player:
             self.update_damage_animation()
         else:
             if self.has_flower:
-                self.current_animation = 'flower'
-                self.current_sprite += self.animation_speed
-                if self.current_sprite >= len(self.sprites[self.current_animation]):
-                    self.current_sprite = 0
-            elif self.is_jumping:
-                self.current_animation = 'jump'
-                self.current_sprite = 0
-            elif self.is_walking:
-                self.current_animation = 'walk'
-                self.current_sprite += self.animation_speed
-                if self.current_sprite >= len(self.sprites[self.current_animation]):
-                    self.current_sprite = 0
+                if self.is_jumping:
+                    self.image = self.flower_sprites['jump'][0]
+                elif self.is_walking:
+                    self.current_sprite += self.animation_speed
+                    if self.current_sprite >= len(self.flower_sprites['walk']):
+                        self.current_sprite = 0
+                    self.image = self.flower_sprites['walk'][int(self.current_sprite)]
+                else:
+                    self.image = self.flower_sprites['idle'][0]
             else:
-                self.current_animation = 'idle'
-                self.current_sprite = 0
+                # Regular Mario animations
+                if self.is_jumping:
+                    self.current_animation = 'jump'
+                    self.current_sprite = 0
+                elif self.is_walking:
+                    self.current_animation = 'walk'
+                    self.current_sprite += self.animation_speed
+                    if self.current_sprite >= len(self.sprites[self.current_animation]):
+                        self.current_sprite = 0
+                else:
+                    self.current_animation = 'idle'
+                    self.current_sprite = 0
+                
+                self.image = self.sprites[self.current_animation][int(self.current_sprite)]
             
             if self.holding_jump:
                 self.continue_jump()
-            
-            self.image = self.sprites[self.current_animation][int(self.current_sprite)]
         
         if not self.facing_right:
             self.image = pygame.transform.flip(self.image, True, False)
