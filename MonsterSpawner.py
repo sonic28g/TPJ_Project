@@ -1,5 +1,4 @@
-from Goomba import Goomba
-from Koopa import Koopa
+from Monster import Goomba, Koopa
 
 class MonsterSpawner:
     def __init__(self):

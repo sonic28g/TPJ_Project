@@ -5,14 +5,11 @@ from Tube import Tube
 from Block import BlockInt, BlockBreak, BlockBrick
 from MonsterSpawner import MonsterSpawner
 from Settings import *
-from Koopa import Koopa
-from Goomba import Goomba
 from Player import Player
 from Camera import Camera
 from TextManager import TextManager
 from UIManager import UIManager
 from Pole import Pole, Flag
-from Powerup import Mushroom, Flower
 from CollisionSystem import *
 
 class World:

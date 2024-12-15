@@ -2,8 +2,7 @@ import pygame
 from Powerup import Mushroom, Flower
 from Block import BlockInt, BlockBreak
 from Settings import *
-from Koopa import Koopa
-from Goomba import Goomba
+from Monster import Koopa, Goomba
 
 class CollisionTypes:
     """Constants for collision types"""
