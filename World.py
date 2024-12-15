@@ -13,7 +13,7 @@ from TextManager import TextManager
 from UIManager import UIManager
 from Pole import Pole, Flag
 from Powerup import Mushroom, Flower
-from CollisionSystem import CollisionSystem, PowerUpCollisionHandler
+from CollisionSystem import *
 
 class World:
     def __init__(self, screen):
@@ -44,6 +44,8 @@ class World:
         # Collision System
         self.collision_system = CollisionSystem()
         self.collision_system.add_observer(PowerUpCollisionHandler(self))
+        self.collision_system.add_observer(PlayerCollisionHandler(self))
+        self.collision_system.add_observer(MonsterCollisionHandler(self))
         
         # Camera
         self.camera = Camera(SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -231,179 +233,45 @@ class World:
                     self.player.velocity_x = 0
             return
         
+        # Apply gravity
+        self.player.velocity_y += GRAVITY
+        self.player.rect.y += self.player.velocity_y
+        
         # List for active monsters
         active_monsters = []
         
         # Update monsters
         for monster in self.monsters:
             monster.update()
-
-            if monster.is_alive:
-                # Check for collisions between monster and platforms
-                for platform in self.platforms:
-                    if monster.rect.colliderect(platform.rect):
-                        # [Platform collision logic remains the same]
-                        if monster.velocity_y > 0:
-                            monster.rect.bottom = platform.rect.top
-                            monster.velocity_y = 0
-                        elif monster.velocity_y < 0:
-                            monster.rect.top = platform.rect.bottom
-                            monster.velocity_y = 0
-                        elif monster.rect.right > platform.rect.left and monster.rect.left < platform.rect.left:
-                            monster.rect.right = platform.rect.left
-                            monster.velocity_x *= -1
-                        elif monster.rect.left < platform.rect.right and monster.rect.right > platform.rect.right:
-                            monster.rect.left = platform.rect.right
-                            monster.velocity_x *= -1
-                
-                # Check for collisions between monster and tubes
-                for tube in self.tubes:
-                    if monster.rect.colliderect(tube.rect):
-                        if monster.velocity_y > 0 and monster.rect.bottom < tube.rect.centery:
-                            monster.rect.bottom = tube.rect.top
-                            monster.velocity_y = 0
-                        elif monster.rect.right > tube.rect.left and monster.rect.left < tube.rect.left:
-                            monster.rect.right = tube.rect.left
-                            monster.velocity_x *= -1
-                        elif monster.rect.left < tube.rect.right and monster.rect.right > tube.rect.right:
-                            monster.rect.left = tube.rect.right
-                            monster.velocity_x *= -1
-                
-                # Check for collisions between monster and player
-                if monster.rect.colliderect(self.player.rect):
-                    # Player is above monster (stomping)
-                    if (self.player.velocity_y > 0 and self.player.rect.bottom < monster.rect.centery + 10):
-                        if isinstance(monster, Koopa):
-                            if not monster.is_shell:
-                                # Turn Koopa into shell instead of dying
-                                monster.convert_to_shell()
-                                self.player.velocity_y = -15
-                                self.score += 100
-                            else:
-                                # If already a shell
-                                if monster.velocity_x != 0:
-                                    # If shell is moving, stop it
-                                    monster.velocity_x = 0
-                                else:
-                                    # If shell is stopped, kick it
-                                    direction = 1 if self.player.rect.centerx < monster.rect.centerx else -1
-                                    monster.kick_shell(direction)
-                                    
-                                self.player.velocity_y = -10  # Add bounce when kicking shell
-                                self.score += 100
-                        else:
-                            monster.die()
-                            self.player.velocity_y = -15  # Bounce player up
-                            self.score += 100
-                    elif monster.is_alive or (isinstance(monster, Koopa) and monster.is_shell and monster.velocity_x != 0):
-                        # Player dies if touching monster from the side or below
-                        # Player take damage if is_big is True
-                        if self.player.is_big:
-                            self.player.take_damage()
-                        else:
-                            self.player_die()
-                            return
                         
             # Keep the monster if it's still alive, is a Koopa shell, or is playing death animation
-            if  monster.is_alive or isinstance(monster, Koopa) or (isinstance(monster, Goomba) and not monster.should_remove()):
+            if monster.is_alive or isinstance(monster, Koopa) or (isinstance(monster, Goomba) and not monster.should_remove()):
                 active_monsters.append(monster)
         
         # Update the monsters list to only include active monsters
         self.monsters = active_monsters
-        
-        # Apply gravity
-        self.player.velocity_y += GRAVITY
-        self.player.rect.y += self.player.velocity_y
-
-        # Check for collisions between player and platforms
-        for platform in self.platforms:
-            if self.player.rect.colliderect(platform.rect):
-                if self.player.velocity_y > 0 and self.player.rect.right > platform.rect.left + 10 and self.player.rect.left < platform.rect.right - 10:
-                    self.player.rect.bottom = platform.rect.top
-                    self.player.velocity_y = 0
-                    self.player.is_jumping = False
-                elif self.player.velocity_y < 0:
-                    self.player.rect.top = platform.rect.bottom
-                    self.player.velocity_y = 0 
-                elif self.player.rect.right > platform.rect.left and self.player.rect.left < platform.rect.left:
-                    self.player.rect.right = platform.rect.left
-                elif self.player.rect.left < platform.rect.right and self.player.rect.right > platform.rect.right:
-                    self.player.rect.left = platform.rect.right
 
         # Check for collisions between player and blocks
-        for block in self.blocks:
+        """ for block in self.blocks:
             # Check if block is active for collision
             if isinstance(block, BlockBreak) and not block.active:
                 continue
-            
-            if self.player.rect.colliderect(block.rect):
-                # Check if the self.player is landing on the block
-                if (
-                    self.player.rect.top < block.rect.top
-                    and self.player.velocity_y > 0
-                    and self.player.rect.right > block.rect.left + 5  # Sufficient horizontal overlap (right side)
-                    and self.player.rect.left < block.rect.right - 5  # Sufficient horizontal overlap (left side)
-                ):
-                    self.player.rect.bottom = block.rect.top
-                    self.player.velocity_y = 0
-                    self.player.is_jumping = False
-                # Check if the self.player hits the bottom of the block
-                elif (
-                    self.player.rect.bottom > block.rect.bottom
-                    and self.player.velocity_y < 0  # Moving upwards
-                    and self.player.rect.right > block.rect.left + 5  # Avoid triggering on side collisions
-                    and self.player.rect.left < block.rect.right - 5  # Avoid triggering on side collisions
-                ):
-                    self.player.rect.top = block.rect.bottom
-                    self.player.velocity_y = GRAVITY  # Bounce down
-                    self.player.holding_jump = False  # Stop the jump charge
-                    self.player.jump_force = 0  # Reset jump force
-                    if isinstance(block, (BlockInt, BlockBreak)):
-                        if isinstance(block, BlockBreak):
-                            block.hit(self.player.is_big)
-                        elif isinstance(block, BlockInt):
-                            block.hit()
+        """
 
-                # Check for left-side collision
-                elif self.player.rect.right > block.rect.left and self.player.rect.left < block.rect.left:
-                    self.player.rect.right = block.rect.left
-                # Check for right-side collision
-                elif self.player.rect.left < block.rect.right and self.player.rect.right > block.rect.right:
-                    self.player.rect.left = block.rect.right
-                    
-            # Update coins
-            if isinstance(block, BlockInt) and block.coin:
-                block.coin.update()
-                if block.coin.is_collected:
-                    self.coins += 1
-                    self.score += 200
-                    block.coin = None
-
-        # Check for collisions between player and tubes
-        for tube in self.tubes:
-            if self.player.rect.colliderect(tube.rect):
-                if (
-                    self.player.rect.top < tube.rect.top 
-                    and self.player.velocity_y > 0  
-                    and self.player.rect.right > tube.rect.left + 5  # Sufficient horizontal overlap (right side)
-                    and self.player.rect.left < tube.rect.right - 5  # Sufficient horizontal overlap (left side)
-                ):
-                    self.player.rect.bottom = tube.rect.top
-                    self.player.velocity_y = 0  
-                    self.player.is_jumping = False 
-                elif self.player.rect.right > tube.rect.left and self.player.rect.left < tube.rect.left:
-                    self.player.rect.right = tube.rect.left
-                elif self.player.rect.left < tube.rect.right and self.player.rect.right > tube.rect.right:
-                    self.player.rect.left = tube.rect.right
-        
-        # Update and check power-up collisions
+        # Update powerups and coins
         for block in self.blocks:
             if isinstance(block, BlockInt):
+                if block.coin:
+                    block.coin.update()
+                    if block.coin.is_collected:
+                        self.coins += 1
+                        self.score += 200
+                        block.coin = None
                 for powerup in [block.mushroom, block.flower]:
                     if powerup and powerup.is_active:
                         powerup.update()
         
-        # Check Power-up collisions
+        # Check collisions
         self.collision_system.check_collisions(self)
         
         # Update player
@@ -415,8 +283,6 @@ class World:
                 self.pole_collision()
             elif self.player.rect.colliderect(self.flag.rect):
                 self.flag_collision()
-        
-        print(self.player.rect)
         
         # Prevent monster from moving off screen
         for monster in self.monsters:
